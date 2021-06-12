@@ -338,6 +338,40 @@ String[] args = new String[5]; // 5개의 문자열을 담을 수 있는 배열�
 |double|0.0d 또는 0.0|
 |**참조형 변수**|**null**|
 
+
+#### About '\u0000'
+
+`유니코드(16진수)문자` : `\u유니코드` (EX) char a = '\u0041';
+
+```java
+public class CharTest {
+	public static void main(String[] args) {
+        char char1 = '\u0000';
+        char char2 = '\u0001';
+        char char3 = '\u0002';
+        char char4 = '\u0041';
+        char char5 = '\uAC00';
+        char char6 = 0xAC00;
+        
+        System.out.println("char1 : " + char1);
+        System.out.println("char2 : " + char2);
+        System.out.println("char3 : " + char3);
+        System.out.println("char4 : " + char4);
+        System.out.println("char5 : " + char5);
+        System.out.println("char6 : " + char6);
+    }
+	// 실행결과
+	
+	// char1 :  
+	// char2 : 
+	// char3 : 
+	// char4 : A
+	// char5 : 가
+	// char6 : 가
+}
+
+```
+
 ### String 배열의 초기화
 
 ```java
