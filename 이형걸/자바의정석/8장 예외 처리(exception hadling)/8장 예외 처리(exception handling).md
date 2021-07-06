@@ -374,12 +374,377 @@ class ExceptionEx11 {
 
 ## 메서드에 예외 선언하기
 
+메서드의 선언부에 `키워드 throws` 를 사용해서 메서드 내에서 발생할 수 있는 예외를 적어주기만 하면 된다. 
 
+```java
+void method() throws Exception1, Exception2, ...ExceptionN {
+	// 메서드 내용
+}
+```
 
+- 메서드를 사용하는 사람이 메서드의 선언부만 보고도, 이 메서드를 사용하기 위해 어떠한 예외들이 처리되어야 하는지 쉽게 알 수 있다.
 
+- **이 메서드를 호출한 메서드에서 이 예외에 대한 처리를 강제하도록 강요하는 것이다.**
 
+- 메서드에 예외를 선언할 때는 **반드시 처리해야 하는 예외들만 선언한다. RuntimeException들은 선언하지 않는다.**
 
+- 어느 한 곳에서는 반드시 `try-catch문` 으로 예외를 처리해주어야 한다.
 
+```java
+class ExceptionEx14 {
+	public static void main(String[] args) {
+		try  {
+				method1();		
+		} catch (Exception e)	{
+				System.out.println("main메서드에서 예외가 처리되었습니다.");
+				e.printStackTrace();
+		}
+	}
+
+	static void method1() throws Exception {
+		throw new Exception();
+	}	
+} 
+```
+
+```json
+main메서드에서 예외가 처리되었습니다.
+java.lang.Exception
+	at ExceptionEx14.method1 (ExceptionEx14.java:12)
+	at ExceptionEx14.main (ExceptionEx14.java:4)
+```
+
+## finally 블럭
+
+`finally 블럭` : **예외의 발생여부에 상관없이 실행되어야할 코드를 포함시킬 목적으로 사용한다.**
+
+```java
+try {
+	// 예외가 발생할 가능성이 있는 문장들을 넣는다. 
+} catch {
+	// 예외처리를 위한 문장을 적는다.
+} finally {
+	// 예외의 발생여부에 관계없이 항상 수행되어야하는 문장들을 넣는다.
+	// finally 블럭은 try-catch문의 맨 마지막에 위치해야한다.
+}
+```
+
+```java
+class FinallyTest3 {
+	public static void main(String args[]) {
+		// method1()은 static메서드이므로 인스턴스 생성없이 직접 호출이 가능하다.
+		FinallyTest3.method1();		
+        System.out.println("method1()의 수행을 마치고 main메서드로 돌아왔습니다.");
+	}	
+
+	static void method1() {
+		try {
+			System.out.println("method1()이 호출되었습니다.");
+			return;		// 현재 실행 중인 메서드를 종료한다.
+		}	catch (Exception e)	{
+			e.printStackTrace();
+		} finally {
+			System.out.println("method1()의 finally블럭이 실행되었습니다.");
+		}
+	}	
+}
+```
+
+```json
+실행결과
+method1()이 호출되었습니다.
+method1()의 finally 블럭이 실행되었습니다.
+method1()의 수행을 마치고 main메서드로 돌아왔습니다.
+```
+
+- **try 블럭에서 return 문이 실행되는 경우** 에도 **finally블럭의 문장들이 먼저 실행된 후에, 현재 실행중인 메서드를 종료한다.**
+
+- **catch 블럭에서 return문을 만나는 경우** 에도 **finally블럭의 문장들은 수행된다.**
+
+## 자동 자원 반환_try-with-resources문
+
+- **JDK 1.7** 부터 `try-with-resources문` 이라는 try-catch문의 변형이 새로 추가되었다.
+
+- 입출력에 사용되는 클래스 중에서는 **사용한 후에 꼭 닫아줘야 하는 것들** 이 있다.
+
+- 그렇게 해야 **사용했던 자원(resource)이 반환** 되기 때문이다.
+
+```java
+try {
+	fis = new FileInputStream("score.daat");
+	dis = new DataInputStream(fis);
+} catch (IOException ie) {
+	ie.printStackTrace();
+} finally {
+	try {
+		if(dis != null)
+			dis.close();
+	} catch(IOException ie) {
+		ie.printStackTrace();
+	}
+}
+```
+
+- close() 가 예외를 발생시킬 수 있기 때문에 finally블럭 안에서도 예외처리를 해줘야 한다.
+  - **try블럭과 finally블럭 모두 예외가 발생하면 try문의 예외는 무시된다!!** 는 것이 가장 큰 문제점이다.
+
+```java
+// 괄호 () 안에 두 문장 이상 넣을 경우 ';'로 구분
+try (FileInputStream fis = new FileInputStream("score.daat");
+	DataInputStream dis = new DataInputStream(fis)) {
+
+} catch (IOException ie) {
+} finally {
+}
+```
+
+- try-with-resources문의 괄호() 안에 객체를 생성하는 문장을 넣으면, **이 객체는 따로 close()를 호출하지 않아도 try 블럭을 벗어나는 순간 자동적으로 close()가 호출된다.** 그 다음에 catch블럭 또는 finally블럭이 수행된다.
+
+- try블럭의 괄호() 안에 변수를 선언하는 것도 가능하며, 선언된 변수는 try블럭 내에서만 사용할 수 있다.
+
+```java
+public interface AutoCloseable {
+	void close() throws Exception;
+}
+```
+
+- try-with-resources문에 의해 자동으로 객체의 close()가 호출될 수 있으려면, **클래스가 AutoCloseable이라는 인터페이스를 구현한 것이어야만 한다.**
+
+- 그런데 close()도 예외를 발생시킬 수 있는데, **자동 호출된 close()에서 예외가 발생한다면??**
+
+```java
+class TryWithResourceEx {
+	public static void main(String args[]) {
+
+		try (CloseableResource cr = new CloseableResource()) {
+			cr.exceptionWork(false); // 예외가 발생하지 않는다.
+ 		} catch(WorkException e) {
+			e.printStackTrace();
+		} catch(CloseException e) {
+			e.printStackTrace();
+		}
+		System.out.println();
+	
+		try (CloseableResource cr = new CloseableResource()) {
+			cr.exceptionWork(true); // 예외가 발생한다.
+ 		} catch(WorkException e) {
+			e.printStackTrace();
+		} catch(CloseException e) {
+			e.printStackTrace();
+		}	
+	} 
+}
+
+class CloseableResource implements AutoCloseable {
+	public void exceptionWork(boolean exception) throws WorkException {
+		System.out.println("exceptionWork("+exception+")가 호출됨");
+
+		if(exception)
+			throw new WorkException("WorkException발생!!!");
+	}
+
+	public void close() throws CloseException {
+		System.out.println("close()가 호출됨");
+		throw new CloseException("CloseException발생!!!");
+	}
+}
+
+class WorkException extends Exception {
+	WorkException(String msg) { super(msg); }
+}
+
+class CloseException extends Exception {
+	CloseException(String msg) { super(msg); }
+}
+```
+
+- 첫번째 것은 close()에서만 예외가 발생, 두번째 것은 exceptionWork(), close() 에서 모두 예외가 발생한다.
+
+  - 첫번째는 일반적인 예외가 발생하는 것과 같은 형태인 CloseException이 발생
+  
+  - 두번째는 exceptionWork()에서 발생한 예외에 대한 내용이 출력, close()에서 발생한 예외는 `억제된 Suppressed` 이라는 의미와 **함께 출력**
+
+  - 두 예외가 동시에 발생할 수 없기 때문에, 실제 발생한 예외는 WorkExceptio으로 하고, CloseException은 억제된 예외로 다룬다.
+  
+  - 억제된 예외에 대한 정보는 WorkException에 저장된다.
+  
+  - `Throwable` 에는 억제된 예외와 관련된 메서드가 정의되어 있다.
+  
+  - **만일 기존의 try-catch 문을 사용했다면, 먼저 발생한 WorkException은 무시되고, 마지막으로 발생한 CloseException에 대한 내용만 출력되었을 것이다.** 
+
+```java
+void addSuppressed(Throwable exception) // 억제된 예외를 추가
+Throwable[] getSuppressed() // 억제된 예외(배열)를 반환
+```
+
+## 사용자정의 예외 만들기
+
+- 필요에 따라 프로그래머가 새로운 예외 클래스를 정의하여 사용 가능
+- 보통 Exception클래스 또는 RuntimeException클래스로부터 상속받아 클래스를 만들지만, 필요에 따라 알맞은 예외 클래스를 선택할 수 있다.
+  - 요즘은 예외처리를 선택적으로 할 수 있도록 RuntiomeException을 상속받아서 작성하는 쪽으로 바뀌어가고 있다.
+  
+  - `checked 예외` 는 반드시 예외처리를 해주어야 하기 때문에 예외처리가 불필요한 경우에도 try-catch문을 넣어서 코드가 복잡해지기 때문이다.
+
+- 필요하다면, 멤버 변수나 메서드를 추가할 수 있다.
+
+```java
+class MyException extends RuntimeException {
+	// 에러 코드 값을 위한 필드를 추가
+	private final int ERR_CODE; // 생성자를 통해 초기화 한다.
+	
+	MyException(String msg, int errCode) { // 생성자 
+		super(msg); 
+		ERR_CODE = errCode;
+	}
+
+	MyException(String msg) { // 생성자
+		this(msg, 100); // ERR_CODE를 100(기본값)으로 초기화한다.
+	}
+
+	public int getErrCode() { // 에러 코드를 얻을 수 있는 메서드도 추가했다.
+		return ERR_CODE; // 이 메서드는 주로 getMessage() 와 함께 사용될 것이다.
+	}
+}
+```
+
+## 예외 되던지기(exception re-throwing) 
+
+`예외 되던지기(exception re-throwing)` : 예외를 처리한 후에 인위적으로 다시 발생시키는 방법
+
+- 하나의 예외에 대해서 **예외가 발생한 메서드** 와 **이를 호출한 메서드** **양쪽 모두에서 처리해줘야 할 작업** 이 있을 때 사용된다.
+
+- 주의할 점은 예외가 발생한 메서드에서는 **try-catch문을 사용해서 예외처리를 해줌** 과 동시에 **메서드의 선언부에 발생할 예외를 throws에 지정해줘야 한다** 는 것이다.
+
+```java
+class ExceptionEx17 {
+	public static void main(String[] args) {
+		try  {
+			method1();		
+		} catch (Exception e)	{
+			System.out.println("main메서드에서 예외가 처리되었습니다.");
+		}
+	}	
+
+	static void method1() throws Exception {
+		try {
+			throw new Exception();
+		} catch (Exception e) {
+			System.out.println("method1메서드에서 예외가 처리되었습니다.");
+			throw e; // 다시 예외를 발생시킨다.
+		}
+	}	
+}
+```
+
+```java
+static int method1() {
+	try {
+		System.out.println("method1()이 호출되었습니다.");
+		return 0;
+	} catch (Exception e) {
+		return 1; // catch블럭 내에도 return문 필요
+	}
+}	
+```
+
+- **반환값이 있는 return 문의 경우**, **catch블럭에도 return문이 있어야 한다.**
+  - **예외가 발생해도 값을 return해야 하기 때문이다.**
+
+```java
+static int method1() throws Exception{ // 예외 선언
+	try {
+		System.out.println("method1()이 호출되었습니다.");
+		return 0; // 현재 실행중인 메서드를 종료한다.
+	} catch (Exception e) {
+		// return 1; catch 블럭 내에도 return 문이 필요하다. 
+		throw new Exception(); // return문 대신 예외를 호출한 메서드로 전달
+	} finally {
+		System.out.println("method1()이 finally 블럭이 실행되었습니다.");
+	}
+}	
+```
+
+- **catch블럭에서 예외 되던지기**를 해서 **호출한 메서드로 예외를 전달하면**, **return문이 없어도 된다.**
+
+- **finally블럭에서도 return문 사용 가능하다.** try블럭이나 catch블럭의 return문 다음에 수행된다. **최종적으로 finally블럭 내의 return문의 값이 반환된다.**
+
+## 연결된 예외(chained exception)
+
+**하나의 예외가 다른 예외도 발생시킬 수도 있다.**
+
+- 예외 A가 예외 B를 발생시켰다면, 
+- A를 B의 `원인 예외(cause exception)` 이라고 한다.
+
+```java
+try {
+	startInstall(); // SpaceException 발생
+	copyFiles();
+} catch (SpaceException e) {
+	InstallException ie = new InstallException("설치중 예외발생"); 
+	ie.initCause(e);  // InstallException의 `원인 예외`를 SpaceException로 지정
+	throw ie; // InstallException을 발생시킨다.
+}
+```
+
+- `initCause()` 는 **Exception클래스의 조상** 인 **Throwable클래스에 정의** 되어 있다.
+- **모든 예외에서 사용 가능하다.**
+
+```java
+Throwable initCause(Throwable cause) // 지정한 예외를 원인 예외로 등록
+Throwable getCause() // 원인 예외를 반환
+```
+
+**발생한 예외를 원인 예외로 등록하여 다시 예외를 발생시키는 이유**
+
+1. 여러가지 예외를 하나의 큰 분류의 예외로 묶어서 다루기 위해서이다.
+   - **예외가 워인 예외를 포함할 수 있게 한 것이다.**
+   - 이렇게 하면 두 예외는 **상속관계가 아니어도 상관없다.**
+
+```java
+public class Throwable implements Serializable {
+	...
+	private Throwable cause = this; // 객체 자신(this)을 원인 예외로 등록
+	...
+}
+```
+
+2. checked예외를 unchecked예외로 바꿀 수 있도록 하기 위해서이다.
+
+```java
+static void startInstall() throws SpaceException, MemoryException { 
+	if(!enoughSpace()) { 		// 충분한 설치 공간이 없으면...
+		throw new SpaceException("설치할 공간이 부족합니다.");
+	}
+
+	if (!enoughMemory()) {		// 충분한 메모리가 없으면...
+		throw new MemoryException("메모리가 부족합니다.");
+	}
+} 
+```
+
+- MemoryException은 Exception의 자손이므로 반드시 예외를 처리해야 하는 문제가 있다.
+
+->
+
+```java
+static void startInstall() throws SpaceException { 
+	if(!enoughSpace()) {  // 충분한 설치 공간이 없으면...
+		throw new SpaceException("설치할 공간이 부족합니다.");
+	}
+
+	if (!enoughMemory()) {  // 충분한 메모리가 없으면...
+		throw new RuntimeException(new MemoryException("메모리가 부족합니다."));
+	}
+} 
+```
+
+- 이 예외를 **RuntimeException**으로 감싸버렸기 때문에 **unchecked예외가 되었다.**
+- 더 이상 startIntall() 메서드의 **선언부** 에 MemoryException을 선언하지 않아도 된다.
+- 위의 코드에선 **initCause()** 대신 **RuntimeException의 생성자** 를 사용하였다.
+
+```java
+RuntimeException(Throwable cause) // 원인 예외를 등록하는 생성자
+```
 
 
 
