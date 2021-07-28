@@ -92,7 +92,7 @@ v1과 v2는 같습니다.
     - 찾고자하는 값을 입력하면, 그 값이 저장된 위치를 알려주는 해시코드를 반환한다.
 - 일반적으로 해시코드가 같은 두 객체가 존재하는 것이 가능하지만, Object 클래스에 정의된 hashCode 메서드는 객체의 주소값으로 해시코드를 만들어 반환하기 때문에 32 bit jvm에서는 서로 다른 두 객체는 결코 같은 해시코드를 가질 수 없었다.
 - 하지만 64bit jvm에서는 8 byte 주소값으로 해시코드(4byte)를 만들기 때문에 해시코드가 중복될 수 있다.
-- 마찬가지고 클래스의 인스턴스변수 값으로 객체의 같고 다름을 판단해야하는 경우라면 equals 메서드 뿐만 아니라 hashCode 메서드도 적절히 오버라이딩해야 한다.
+- 마찬가지로 클래스의 인스턴스변수 값으로 객체의 같고 다름을 판단해야하는 경우라면 equals 메서드 뿐만 아니라 hashCode 메서드도 적절히 오버라이딩해야 한다.
     - 같은 객체라면 hashCode 메서드를 호출했을 때의 결과값인 해시코드도 같아야 하기 때문
     - ex) HashMap, HashSet 클래스
 - example
@@ -184,7 +184,7 @@ x=3, y=5
 
 - 공변 반환타입(covariant return type)
     - jdk 1.5부터 추가된 기능
-    - 오버라이디할 때 조상 메서드의 반환타입을 자손 클래스의 타입으로 변경을 허용하는 것
+    - 오버라이딩할 때 조상 메서드의 반환타입을 자손 클래스의 타입으로 변경을 허용하는 것
     - 이처럼 조상의 타입이 아닌, 실제로 반환되는 자손 객체의 타입으로 반환할 수 있어서 번거로운 형변환이 줄어드는 장점
 
     ```java
@@ -256,7 +256,7 @@ x=3, y=5
     - 반면에 원본이 참조하고 있는 객체까지 복제하는 것을 깊은 복사, deep copy
         - 깊은 복사에서는 원본과 복사본이 서로 다른 객체를 참조하기 때문에 원본의 변경이 복사본에 영향을 미치지 않는다.
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_1.png)
+![image_1](./image/1.png)
 
     - example
 
@@ -358,7 +358,7 @@ x=3, y=5
     - 클래스 파일이 '클래스 로더(ClassLoader)'에 의해 메모리에 올라갈 때, 자동으로 생성
         - 클래스 로더는 실행 시에 필요한 클래스를 동적으로 메모리에 로드하는 역할
         - 먼저 기존에 생성된 클래스 객체가 메모리에 존재하는지 확인하고
-            - 있으면 객체의 참조를 반환
+            - 있으면 클래스 객체의 참조를 반환
             - 없으면 클래스 패스에 지정된 경로를 따라서 클래스 파일을 찾는다.
                 - 못찾으면  ClassNotFoundException 발생
                 - 찾으면 해당 클래스 파일을 읽어서 Class 객체로 변환
@@ -479,7 +479,7 @@ x=3, y=5
     String str4 = new String("abc");
     ```
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_2.png)
+![image_2](./image/2.png)
 
     - equals()를 사용했을 때는 문자열의 내용을 비교하기 때문에 true이지만 인스턴스의 주소를 ==로 비교했을 때는 결과가 다르다.
 
@@ -487,7 +487,7 @@ x=3, y=5
 
 - 자바 소스파일에 포함된 모든 문자열 리터럴은 컴파일 시에 클래스 파일(*.class)에 저장된다.
 - 이 때 같은 내용의 문자열 리터럴은 한번만 저장된다. 문자열 리터럴도 String 인스턴스이고, 한번 생성하면 내용을 변경할 수 없으니 하나의 인스턴스를 공유하면 되기 때문이다.
-- 이와 같이 String 리터럴들은 컴파일시에 클래스파일에 저장되며 아래의 예제를 실행하면 "AAA"를 담고 있는 String 인스턴스가 하나 생성된 후, 참조변수 s1, 2, 3, 4가 모두 이 스트링 인스턴스를 참조하게 된다.
+- 이와 같이 String 리터럴들은 컴파일시에 클래스파일에 저장되며 아래의 예제를 실행하면 "AAA"를 담고 있는 String 인스턴스가 하나 생성된 후, 참조변수 s1, 2, 3가 모두 이 스트링 인스턴스를 참조하게 된다.
 - 클래스 파일에는 소스파일에 포함된 모든 리터럴의 목록이 있다.
     - 해당 클래스 파일이 클래스 로더에 의해 메모리에 올라갈 때, 이 리터럴의 목록에 있는 리터럴들이 jvm 내에 있는 '상수 저장소(constant pool)'에 저장된다.
     - 이 때, 이곳에 "AAA"와 같은 문자열 리터럴이 자동적으로 생성되어 저장되는 것이다.
@@ -521,9 +521,9 @@ char c = '\u0000'l ==> char c = ' ';   // 공백으로 초기화
 
 - 자주 사용되는 메서드
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_3.png)
+![image_3](./image/3.png)
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_4.png)
+![image_4](./image/4.png)
 
 - replace vs replaceAll
 
@@ -533,7 +533,7 @@ char c = '\u0000'l ==> char c = ' ';   // 공백으로 초기화
 
     String result2 = str.replaceAll("[abc]", "왕");
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_5.png)
+![image_5](./image/5.png)
 
 ### join()과 StringJoiner
 
@@ -573,7 +573,7 @@ char c = '\u0000'l ==> char c = ' ';   // 공백으로 초기화
 
 - getBytes(String charsetName)을 사용하면, 문자열의 문자 인코딩을 다른 인코딩으로 변경할 수 있다.
 - 자바가 utf-16을 사용하지만, 문자열 리터럴에 포함되는 문자들은 os의 인코딩을 사용한다. 한글 윈도우즈의 경우 문자 인코딩으로 CP949를 사용하며, UTF-8로 변경하려면 아래와 같이 한다.
-    - utf-8은 한글 한글자르 3 byte, cp949는 2 byte로 표현
+    - utf-8은 한글 한글자를 3 byte, cp949는 2 byte로 표현
     - cf) 사용가능한 문자 인코딩의 목록은 System.out.println(java.nio.charset.Cahrset.availableCharsets());
 
     ```java
@@ -588,7 +588,7 @@ char c = '\u0000'l ==> char c = ' ';   // 공백으로 초기화
 
     class StringEx5 {
     	public static void main(String[] args) throws Exception {
-    		String str = "°¡";
+    		String str = "가";
 
     		byte[] bArr  = str.getBytes("UTF-8");
     		byte[] bArr2 = str.getBytes("CP949");
@@ -692,6 +692,7 @@ public static Integer valueOf(String s) throws NumberFormatException {
     - 그러나 부호를 의미하는 '+'나 소수점을 의미하는 '.'와 float형 값을 뜻하는 f와 같은 자료형 접미사는 허용된다.
         - 단 자료형에 알맞은 변환을 하는 경우에만 허용
         - '1.0f'를 Integer.parsetInt() 사용하면 예외, Float.parserFlaoat()은 문제 없다
+    - parseInt(String s , int radix)를 이용하여 진수 값으로 표현된 문자열도 변환 가능
 
 ### StringBuffer 클래스
 
@@ -699,6 +700,7 @@ public static Integer valueOf(String s) throws NumberFormatException {
 - 내부적으로 문자열 편집을 위한 버퍼를 가지고 있으며 인스턴스를 생성할 때 그 크기를 지정할 수 있다.
     - 버퍼의 길이를 충분히 잡아주는 것이 좋다.
     - 편집 중인 문자열입 버퍼의 길이를 넘어서게 되면 버퍼의 길이를 늘려주는 작업이 추가로 수행되어야하기 때문이다.
+
 - 스트링 클래스처럼 문자열을 저장하기 위한 char 배열의 참조변수를 인스턴스 변수로 선언해놓고 있다.
 
 ```java
@@ -730,7 +732,7 @@ public StringBuffer(String str) {
 
 - 스트링 클래스와 달리 내용 변경 가능
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_6.png)
+![image_6](./image/6.png)
 
 - append()는 반환타입이 스트링버퍼인데 자신의 주소를 반환
     - 따라서 연속적으로 append() 호출 가능
@@ -767,13 +769,13 @@ s.equals(s2) ? true
 
 ### StringBuffer 클래스의 생성자와 메서드
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_7.png)
+![image_7](./image/7.png)
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_8.png)
+![image_8](./image/8.png)
 
 ### StringBuilder란?
 
-- 멀티쓰레드에 안전하도록 동기화되어 있다.
+- StringBuffer는 멀티쓰레드에 안전하도록 동기화되어 있다.
 - 동기화가 스트링 버퍼 클래스의 성능을 떨어뜨린다.
 - 그래서 스트링버퍼에서 쓰레드의 동기화만 뺀 스트링빌더가 새로 추가되었다.
 - 스트링 버퍼와 완전히 똑같은 기능으로 작성되어 있다.
@@ -830,7 +832,7 @@ class MathEx1 {
 ```
 
 - rint()도 round()처럼 소수점 첫 째자리에서 반올림이지만, 반환값이 double
-    - 그리고 두 정수의 정가운데 있는 값은 가장 가까운 짝수 정수를 반환
+    - 정수의 정가운데 있는 값은 가장 가까운 짝수 정수를 반환
     - rint(-1.5); → -2.0
 
 ### 예외를 발생시키는 메서드
@@ -922,7 +924,7 @@ negateExact(-2147483648) = 2147483648
 
 - 자주 사용하는 메서드들
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_9.png)
+![image_9](./image/9.png)
 
 ### 래퍼(wrapper) 클래스
 
@@ -937,7 +939,7 @@ negateExact(-2147483648) = 2147483648
 - 래퍼 클래스의 생성자는 매개변수로 문자열이나 각 자료형의 값들을 인자로 받는다.
     - 문자열로 매개변수를 제공할 때, 자료형에 알맞은 문자열을 사용해야 한다.
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_10.png)
+![image_10](./image/10.png)
 
 ```java
 class WrapperEx1 {
@@ -982,7 +984,7 @@ TYPE=int
 - 이 클래스는 추상클래스로 내부적으로 숫자를 멤버변수로 갖는 래퍼 클래스들의 조상이다.
 - 기본형 중에서 숫자와 관련된 래퍼 클래스들은 모두 Number 클래스의 자손이다.
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_11.png)
+![image_11](./image/11.png)
 
 - BigInteger은 long으로도 다룰 수 없는 큰 범우의 정수를
 - BigDecimal은 double로도 다룰 수 없는 큰 범위의 부동 소수점수를 처리하기 위한 것으로 연산자의 역할을 대신하는 다양한 메서드를 제공한다.
@@ -1067,7 +1069,7 @@ TYPE=int
 
     int i = 5;
     Integer iObj = new Integer(7);
-    int sum i + iObj;  // error, jdk 1.5이전
+    int sum = i + iObj;  // error, jdk 1.5이전
     ```
 
 - 그러나 이제는 가능하다. 컴파일러가 자동으로 변환하는 코드를 넣어주기 때문이다.
@@ -1077,7 +1079,7 @@ TYPE=int
 
     int i = 5;
     Integer iObj = new Integer(7);
-    int sum i + iObj.intValue();  // error, jdk 1.5이전
+    int sum = i + iObj.intValue();  // error, jdk 1.5이전
     ```
 
 - 이 외에도 내부적으로 객체 배열을 가지고 있는 Vector 클래스나 ArrayList 클래스에 기본형 값을 저장해야할 때나 형변환이 필요할 때도 컴파일러가 자동으로 코드를 추가해 준다.
@@ -1237,7 +1239,7 @@ void setName(String name) {
 
     ```java
     static int hashCode(Object o)
-    static int hashCode(Object.. vlaues)
+    static int hashCode(Object... vlaues)
     ```
 
 - example
@@ -1326,7 +1328,7 @@ public Random() {
 }
 ```
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_12.png)
+![image_12](./image/12.png)
 
 - example
     - 자주 사용되는 코드는 메서드로 만들어 놓으면 여러모로 도움이 된다.
@@ -1355,7 +1357,6 @@ public Random() {
     		for(int i=0; i < arr.length; i++) {
     			arr[i] = getRand(from, to);
     		}
-
     		return arr;
     	}
 
@@ -1375,7 +1376,7 @@ public Random() {
 
 ### 정규식(regular expresstion) - java.util.regex 패키지
 
-- 정구식이란 텍스트 데이터 중에서 원하는 조건(패턴)과 일치하는 문자열을 찾아 내기 위해 사용하는 것으로 미리 정의된 기호와 문자를 이용해서 작성한 문자열을 말한다.
+- 정규식이란 텍스트 데이터 중에서 원하는 조건(패턴)과 일치하는 문자열을 찾아 내기 위해 사용하는 것으로 미리 정의된 기호와 문자를 이용해서 작성한 문자열을 말한다.
 - 유닉스에서 사용하던 것이고 perl의 강력한 기능이었는데 자바를 비롯한 다양한 언어에서 지원하고 있다.
 - 정규식을 이용하면 원하는 데이터를 뽑아낼 수도 있고 입력된 데이터가 형식에 맞는지 체크할 수도 있다.
 - example
@@ -1436,9 +1437,10 @@ public Random() {
     		}
     	} // public static void main(String[] args) 
     }
+
     ```
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_13.png)
+![image_13](./image/13.png)
 
 - 그룹화
     - 정규식의 일부를 괄호로 나누어 묶어서 그룹화할 수 있다.
@@ -1520,11 +1522,11 @@ public Random() {
         - sb에 저장된 내용: "A drunken hand works, but not a drunken heart"
 - 참고
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_14.png)
+![image_14](./image/14.png)
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_15.png)
+![image_15](./image/15.png)
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_16.png)
+![image_16](./image/16.png)
 
 ### java.util.Scanner 클래스
 
@@ -1599,7 +1601,7 @@ public Random() {
 - 하지만 구분자로 단 하나의 문자 밖에 사용하지 못하는 단점이 있다.
 - 생성자와 메서드
 
-![image_0](../image/chap9_java_lang_패키지와_유용한_클래스_17.png)
+![image_17](./image/17.png)
 
 - exmaple
 
@@ -1678,7 +1680,7 @@ public Random() {
     }
 
     실행결과
-    100|||200|300|개수:5 <- spkit()
+    100|||200|300|개수:5 <- split()
     100|200|300|개수:3 <- StringTokenizer
     ```
 
