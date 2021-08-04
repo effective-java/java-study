@@ -2256,39 +2256,63 @@ class TreeSetEx2 {
 
 ## HashMap과 HashTable
 
-`HashTable` : Vector와 ArrayList의 관계와 같이 **HashTable보다 새로운 버젼인 HashMap을 사용할 것을 권한다.**
+**`HashMap`** : HashTable과 HashMap의 관계는 Vector와 ArrayList의 관계와 같아서 **HashTable보다 새로운 버전인 HashMap을 사용하는 것을 권한다.**
 
-`HashMap` : Map인터페이스를 구현했으므로 Map의 특징인 key, value를 묶어서 하나의 데이터(entry)로 저장한다는 특징이 있다.
-- 해싱(hashing)을 사용하기 때문에 많은 양의 데이터를 검색하는데 있어서 뛰어난 성능을 보인다.
+**`HashTable`** : `Map인터페이스` 를 구현, Map의 특징인 `key` , `value` 를 묶어서 `하나의 데이터(entry)` 로 저장한다는 특징을 갖는다. **`해싱(hashing)`** 을 사용하기 때문에 **많은 양의 데이터**를 **`검색`** 하는데 있어서 **뛰어난 성능**을 보인다.
+
+**[HashMap의 실제 소스]**
 
 ```java
-public class HashMap extends AbstractMap implements Map, Cloneable,
-	Serializable
-{
-		transient Entry[] table;
-		static calss Entry implements Map.Entry {
-				final Object key;
-				Object value;
-		}
+public class HashMap extends AbstractMap implements Map, Cloneable, Serializable {
+	transient Entry[] table;
+	static calss Entry implements Map.Entry {
+		final Object key;
+		Object value;
+	}
 }
 ```
 
-`HashMap`은 `Entry`라는 **내부 클래스를 정의**하고, **다시 Entry 타입의 배열을 선언**하고 있다.
-- 키와 값은 별개의 값이 아니라 서로 관련된 값이기 때문에 각각의 배열로 선언하기 보다는 하나의 클래스로 정의해서 하나의 배열로 다루는 것이 데이터의 무결성적인 측면에서 더 바람직하기 때문
+|비객체지향적인 코드|객체지향적인 코드|
+|---|---|
+|Object[] key; Object[] value; |Entry[] table;|
+||class Entry { Object key; Object value; }|
 
-Map.Entry는 Map 인터페이스에 정의된 static inner interface이다.
+[참고] Map.Entry는 Map인터페이스에 정의된 `static inner interface` 이다.
+ 
+HashMap은 **Entry** 라는 **내부 클래스**를 정의하고, 다시 Entry타입의 배열을 선언한다.
+- **key와 value**는 별개의 값이 아니라 **서로 관련된 값**이기 때문에,
+- 각각의 배열로 선언하기 보다 **하나의 클래스로 정의**해서 **하나의 배열**로 다루는 것이 **데이터의 무결성(Integrity)** 적인 측면에서 더 바람직하다. 
 
-- HashMap은 키와 값을 각각 Object 타입으로 저장한다.
-  - 즉 (Object, Object)의 형태로 저장하기 때문에 어떠한 객체도 저장할 수 있지만 **key는 주로 String을 대문자 또는 소문자로 통일해서 사용하곤 한다.**
-  
-- `key` : 컬렉션 내의 키 중에서 유일해야 한다.
-- `value` : 키와 달리 데이터의 중복을 허용한다.
+**HashMap**은 key와 value를 **각각 Object타입으로 저장**한다. 
+- `(Object, Object)` 의 형태로 저장
+- **어떠한 객체도 저장**할 수 있다. **key는 주로 String**을 대문자 또는 소문자로 통일해서 사용
+
+**`key`** : 컬렉션 내의 **key중에서 유일**해야 한다.
+
+**`value`** : key와 달리 **데이터의 중복을 허용**한다.
+
 
 ### HashMap메서드 (책에는 Object clone()도 포함)
 
 ![hashMap메서드](https://user-images.githubusercontent.com/56071088/126461547-f6a7d19b-8541-4b51-8bab-85b5e5359ccd.png)
 
 - 람다와 스트림에 관련된 것들은 제외
+
+[자주 사용하는 HashMap 메서드]
+
+- **void clear()** : HashMap에 저장된 모든 객체를 제거
+
+- **boolean containsKey(Object key)** : HashMap에 지정된 Key가 포함되어 있는지 알려준다. **(포함되어 있다면 true)**
+- **boolean containsValue(Object value)** : HashMap에 지정된 value가 포함되어 있는지 알려준다. **(포함되어 있다면 true)**
+- **Set entrySet()** : HashMap에 저장된 key와 value를 **Entry(key와 value의 결합)의 형태**로 **Set에 저장해서 반환**
+- **Set keySet()** : HashMap에 저장된 모든 key가 저장된 Set을 반환
+- **Collection values()** : HashMap에 저장된 **모든 value**를 **Collection의 형태로 반환**
+- **Object get(Obejct key)** : 지정된 key의 값(객체)을 반환, **못 찾으면 null 반환**
+- **Object getOrDefault(Object key, Object defaultValue)** : 지정된 key의 값(객체)을 반환, **key를 못 찾으면, 기본값(defaultValue)로 지정된 객체를 반환**
+- **Object put(Object key, Object value)** : 지정된 key와 value을 HashMap에 저장
+- **void putAll()** : map에 저장된 모든 요소를 HashMap에 저장
+- **Object replace(Object key, Object value)** : 지정된 Key의 값을 지정된 객체(value)로 대체
+- **boolean replace(Object key, Object oldValue, Object newValue)** : 지정된 key와 객체(oldValue)가 모두 일치하는 경우에만 세로운 객체(newValue)로 대체
 
 [hashMap 사용 예시 - 중복된 key 사용시 value의 값은 덮어씌워진다]
 
@@ -2297,36 +2321,35 @@ import java.util.*;
 
 class HashMapEx1 {
 	public static void main(String[] args) {
-    	HashMap map = new HashMap();
-    	map.put("myId", "1234");
-    	map.put("asdf", "1111");
-    	map.put("asdf", "1234");
+		HashMap map = new HashMap();
+		map.put("myId", "1234");
+		map.put("asdf", "1111");
+		map.put("asdf", "1234");
 
-    	Scanner s = new Scanner(System.in);	// 화면으로부터 라인단위로 입력받는다.
+		Scanner s = new Scanner(System.in);	// 화면으로부터 라인단위로 입력받는다.
 
-    	while(true) {
-    		System.out.println("id와 password를 입력해주세요.");
-    		System.out.print("id :");
-    		String id = s.nextLine().trim();
+		while(true) {
+			System.out.println("id와 password를 입력해주세요.");
+			System.out.print("id :");
+			String id = s.nextLine().trim();
 
-    		System.out.print("password :");
-    		String password = s.nextLine().trim();
-    		System.out.println();
+			System.out.print("password :");
+			String password = s.nextLine().trim();
+			System.out.println();
 
-    		if(!map.containsKey(id)) {
-    			System.out.println("입력하신 id는 존재하지 않습니다. 다시 입력해주세요.");
-    			continue;
-    		} 
-			else {
-    			if(!(map.get(id)).equals(password)) {
-    				System.out.println("비밀번호가 일치하지 않습니다. 다시 입력해주세요.");
-    			} 
-				else {
-    				System.out.println("id와 비밀번호가 일치합니다.");				break;
-    			}
-    		}
-    	} // while
-    } // main의 끝
+			if(!map.containsKey(id)) {
+				System.out.println("입력하신 id는 존재하지 않습니다. 다시 입력해주세요.");
+				continue;
+			} else {
+				if(!(map.get(id)).equals(password)) {
+					System.out.println("비밀번호가 일치하지 않습니다. 다시 입력해주세요.");
+				} else {
+					System.out.println("id와 비밀번호가 일치합니다.");						
+					break;
+				}
+			}
+		} // while
+	} // main의 끝
 }
 ```
 
@@ -2347,40 +2370,43 @@ id와 pw일치
 [hashMap 사용 예시 - entrySert(), keySet(), values()]
 
 ```java
+import java.util.*;
+
 class HashMapEx2 {
 	public static void main(String[] args) {
-    	HashMap map = new HashMap();
-    	map.put("김자바", new Integer(90));
-    	map.put("이자바", new Integer(100));
-    	map.put("강자바", new Integer(80));
-    	map.put("안자바", new Integer(90));
+		HashMap map = new HashMap();
+		map.put("김자바", new Integer(90));
+		map.put("김자바", new Integer(100));
+		map.put("이자바", new Integer(100));
+		map.put("강자바", new Integer(80));
+		map.put("안자바", new Integer(90));
 
-    	Set set = map.entrySet();
-    	Iterator it = set.iterator();
+		Set set = map.entrySet();
+		Iterator it = set.iterator();
 
-    	while(it.hasNext()) {
-    		Map.Entry e = (Map.Entry)it.next();
-    		System.out.println("이름 : "+ e.getKey() + ", 점수 : " + e.getValue();
-    	}
+		while(it.hasNext()) {
+			Map.Entry e = (Map.Entry)it.next();
+			System.out.println("이름 : "+ e.getKey() + ", 점수 : " + e.getValue());
+		}
 
-    	set = map.keySet();
-    	System.out.println("참가자 명단 : " + set);
+		set = map.keySet();
+		System.out.println("참가자 명단 : " + set);
 
-    	Collection values = map.values();
-    	it = values.iterator();
+		Collection values = map.values();
+		it = values.iterator();
 
-    	int total = 0;
+		int total = 0;
 
-    	while(it.hasNext()) {
-    		Integer i = (Integer)it.next();
-    		total += i.intValue();
-    	}
+		while(it.hasNext()) {
+			Integer i = (Integer)it.next();
+			total += i.intValue();
+		}
 
-    	System.out.println("총점 : " + total);
-    	System.out.println("평균 : " + (float)total/set.size());
-    	System.out.println("최고점수 : " + Collections.max(values));
-    	System.out.println("최저점수 : " + Collections.min(values));
-    }
+		System.out.println("총점 : " + total);
+		System.out.println("평균 : " + (float)total/set.size());
+		System.out.println("최고점수 : " + Collections.max(values));
+		System.out.println("최저점수 : " + Collections.min(values));
+	}
 }
 ```
 
@@ -2390,6 +2416,8 @@ class HashMapEx2 {
 [HashMap 사용 예시]
 
 ```java
+import java.util.*;
+
 class HashMapEx3 {
 	static HashMap phoneBook = new HashMap();
 
@@ -2517,39 +2545,65 @@ Z : # 1
 K : ###### 6
 ```
 
-- 한정된 범위 내에 있는 순차적인 값들의 빈도수는 배열을 이용하지만,
-- **한정되지 않은 범위의 비순차적인 값들의 빈도수** `HashMap`을 이용해서 구할 수 있다.
-- 결과를 보면 알 듯이 **해싱을 구현한 컬렉션 클래스들**은 **저장순서를 유지하지 않는다.**
+**문자열 배열에 담긴 문자열들의 빈도수를 구하는 예제**
+- 한정된 범위 내에 있는 순차적인 값들의 빈도수는 배열을 이용하지만, 
+- **한정되지 않은 범위**의 **비순차적인 값들의 빈도수**는 **HashMap을 이용**해서 구할 수 있다. 
 
 ### 해싱과 해시함수
 
-- `해싱`이란 `해시함수(hash function)` 를 이용해서 **데이터를 해시테이블에 저장하고 검색하는 기법** 을 말한다.
-- 해시함수는 데이터가 저장되어 있는 곳을 알려주기 때문에 다량의 데이터 중에서도 원하는 데이터를 빠르게 찾을 수 있다.
-- 해싱에서 사용하는 자료구조는 다음과 같이 배열과 링크드 리스트의 조합으로 되어 있다.
-- 저장할 데이터의 키를 해시함수에 넣으면 배열의 한 요소를 얻게 되고, 다시 그 곳에 연결되어 있는 링크드 리스트에 저장하게 된다.
+`해싱(hashing)`이란 `해시함수(hash function)`을 이용해서 **데이터**를 **해시테이블(hash table)** 에 **저장하고 검색하는 기법**을 말한다.
+
+해싱을 구현한 컬렉션 클래스로는 HashSet, HashMap, Hashtable 등이 있다. Hashtable은 Collection Framework이 도입되면서 HashMap으로 대체되었고, 호환성의 문제로 남겨두고 있다.
+
+**해싱에서 사용하는 자료구조**는 **`배열과 링크드 리스트의 조합`** 으로 되어 있다.
+
+![배열과 링크드 리스트의 조합](https://user-images.githubusercontent.com/56071088/126956600-6b0f7ea8-48cf-4c3e-8420-9e2e9efbe228.png)
+
+저장할 데이터의 key를 hash function에 넣으면 배열의 한 요소를 얻게 되고, 다시 그 곳에 연결되어 있는 링크드 리스트에 저장한다.
+- 배열의 각 요소에는 링크드 리스트가 저장되어 있어서 **실제 데이터는 링크드 리스트에 담겨지게 된다.**
 
 ![해싱](https://user-images.githubusercontent.com/56071088/126463882-e11b2a14-006b-4b8f-b196-bc66070c992f.png)
 
+1. 검색하고자 하는 값을 **key**로 **해시함수(hash function)** 를 호출한다.
+2. **해시함수의 계산결과(hashCode)** 로 **해당 값이 저장되어 있는 linked list를 찾는다.**
+3. **linked list**에서 **검색한 key와 일치하는 데이터를 찾는다.**
 
-- 배열의 인덱스가 n인 요소의 주소 = 배열의 시작주소 + type의 size * n
-- 그래서 해쉬함수로 만든 해시(hashCode, hash)의 성능이 좋아서 한 해쉬에 하나의 데이터만 저장되어 있는 형태가 더 빠른 검색결과를 얻을 수 있다.
-- 따라서 하나의 링크드 리스트에 최소한의 데이터만 저장되려면, 저장될 데이터를 크기를 고려해서 HashMap의 크기를 적절하게 지정해주어야 하고
-- 해시함수가 서로 다른 키에 대해서 중복된 해시코드의 반환을 최소화해야 한다.
-- 그래서 해싱을 구현하는 과정에서 제일 중요한 것은 해시함수의 알고리즘이다.
-- 실제 HashMap과 같이 해싱을 구현한 컬렉션 클래스에서는 Object 클래스의 정의된 hashCode()를 해시함수로 사용한다.
-    - 객체의 주소를 이용하는 알고리즘으로 해시코드를 만들어내기 때문에 모든 객체에 대해 hashCode()를 호출한 결과가 서로 유일한 훌륭한 방법이다.
-- HashSet에서 설명한 것처럼 서로 다른 두 객체에 대해 equals()로 비교한 결과가 true인 동시에 hashCode()의 반환값이 같아야 같은 객체로 인식한다.
-    - HashMap도 같은 방법으로 객체를 구별하며, 이미 존재하는 키에 대한 값을 저장하면 기존의 값을 새로운 값으로 덮어쓴다.
-    - 그래서 새로운 클래스를 정의할 때 equals()를 재정의오버라이딩해야한다면 hashCode()도 같이 재정의해서 equals()의 결과가 true인 두 객체의 hashCode()의 결과 값이 항상 같도록 해주어야 한다.
-    - 그렇지 않으면 HashMap과 같이 해싱을 구현한 컬렉션 클래스에서는 equal()의 호출결과가 true지만 해시코드가 다른 두 객체를 서로 다른 것으로 인식하고 따로 저장할 것이다.
-    - equals()로 비교한 결과가 false이고 해시코드가 같은 경우는 같은 링크드 리스트에 저장된 서로 다른 두 데이터가 된다.
+linked list는 검색에 불리한 자료구조, linked list의 크기가 커질수록 검색속도가 떨어지게 된다. 
+
+반면에, 배열(array)은 배열의 크기가 커져도, 원하는 요소가 몇 번째에 있는지만 알면 공식을 통해 빠르게 원하는 값을 얻을 수 있다.
+
+- **배열의 인덱스가 n인 요소의 주소** : **배열의 시작주소 + type의 size * n**
+
+따라서 하나의 요소에 많은 데이터가 저장되어 있는 형태보다는 **많은 요소에 하나의 데이터씩만 저장되어 있는 형태**가 **더 빠른 겸색 결과**를 얻을 수 있다.
+
+**하나의 linked list**에 **최소한의 데이터만 저장**되려면, 
+- **저장될 데이터의 크기**를 고려해서 **HashMap의 크기를 적절하게 지정**
+- **해시함수(hash function)** 가 **서로 다른 key**에 대해서 **중복된 해시코드(hashCode)의 반환을 최소화**
+
+그래야 **HashMap에 빠른 검색시간**을 얻을 수 있다.
+
+**`HashMap과 같이 해싱(hashing)을 구현한 컬렉션 클래스`** 에서는 **Object클래스에 정의된 hashCode()를 해시함수로 이용**한다.
+- `Object클래스의 hashCode()` 는 **객체의 주소를 이용하는 알고리즘**으로 hashCode를 만들어 낸다.
+- **모든 객체에 대해 hashCode()를 호출한 결과가 서로 유일한 훌륭한 방법**
+
+`String클래스의 경우` : Object클래스로부터 상속받는 hashCode()를 오버라이딩(overriding)하여 **문자열의 내용으로 hashCode**를 만들어 낸다.
+- 서로 다른 인스턴스일지라도 **문자열의 내용이 같다면 hashCode()를 호출하면 같은 hashCode를 얻는다.**
+
+서로 다른 두 객체에 대해 **equals()로 비교한 결과가 true**인 동시에 **hashCode()의 반환값이 같아야 같은 객체로 인식**
+- HashMap에서도 같은 방법으로 객체를 구별
+- 이미 존재하는 key에 대한 값을 저장하면 기존의 값을 새로운 값으로 덮어쓴다.
+
+**`새로운 클래스를 정의`** : equals()를 오버라이딩(overriding) 해야 한다면, hashCode()도 같이 오버라이딩(overriding) 해야 한다.
+- **두 객체의 equals()의 결과가 true -> 두 객체의 hashCode()의 결과 값이 항상 같도록 해야 한다.** 
+
+**두 객체의 equals()의 결과가 false, 두 객체의 hashCode()의 결과가 같은 경우** : **같은 linked list**에 저장된 **서로 다른 data**가 된다.
 
 ## TreeMap
 
 `TreeMap` : **이진검색트리의 형태로 key와 value의 쌍으로 이루어진 데이터를 저장한다.**
 - **검색과 정렬에 적합한 컬렉션 클래스**이다.
-- 검색 성능: HashMap > TreeMap
-- 범위검색이나 정렬: HashMap < TreeMap
+- **검색** 성능 : **HashMap** > TreeMap
+- **범위검색**이나 **정렬** : HashMap < **TreeMap**
 
 ### TreeMap 메서드
 
@@ -2603,7 +2657,7 @@ class TreeMapEx1 {
 			System.out.println(entry.getKey() + " : " + printBar('#', value) + " " + value );
 		}
 
-	} // 	public static void main(String[] args) 
+	} // public static void main(String[] args) 
 
 	static class ValueComparator implements Comparator {
 		public int compare(Object o1, Object o2) {
@@ -2618,7 +2672,7 @@ class TreeMapEx1 {
 			} 
 			return -1;
 		}
-	}	// 	static class ValueComparator implements Comparator {
+	}	// static class ValueComparator implements Comparator {
 
 	public static String printBar(char ch, int value) { 
 		char[] bar = new char[value]; 
@@ -2653,16 +2707,18 @@ Z: # 1
 
 ## Properies
 
-`Properies`는 HashMap의 구버전인 **Hashtable을 상속받아 구현한 것**으로, Hashtable은 키와 값을 (Object, Object)의 형태로 저장하는데 비해 **Properies(String, String)의 형태로 저장하는 보다 단순화된 컬렉션 클래스이다.**
-- 주로 **애플리케이션의 환경설정과 관련된 속성을 저장하는데 사용**되며 **데이터를 파일로부터 읽고 쓰는 편리한 기능을 제공**한다.
-- 그래서 **간단한 입출력**은 **Properies를 활용**하면 **몇 줄의 코드로 쉽게 해결**될 수 있다.
-
+**`Properties`** 
+- HashTable을 상속받아 구현
+- Properties는 **(String, String)** 의 형태로 저장하는 **보다 단순화된 컬렉션 클래스**
+  - HashMap은 key와 value를 (Object, Object)의 형태로 저장
+- **애플리케이션의 환경설정과 관련된 속성(Property)을 저장**하는데 사용되며 **데이터를 파일로부터 읽고 쓰는 편리한 기능을 제공**
+- **간단한 입출력**은 **Properties를 활용**하면 몇 줄의 코드로 쉽게 해결 
 ### Propertirs 메서드
 
 ![properties메서드](https://user-images.githubusercontent.com/56071088/126464974-894ffb9a-fb52-411a-8ca5-1b085f5c9324.png)
 
-- Set stringPropertyNames(): Properies에 저장되어 있는 모든 key를 Set에 담아서 반환한다.
-  
+[Properties의 메서드 사용 예제]
+
 ```java
 import java.util.*;
 
@@ -2714,19 +2770,30 @@ timeout=30
 language=kr
 ```
 
-- setProperty()는 단순히 Hashtable의 put메서드 호출
-  - 기존에 같은 key로 저장된 값이 있는 경우 그 값을 Object타입으로 반환
-  - 그렇지 않을 때는 null
+**Object setProperty(String key, String value)** : Hashtable의 put()메서드와 똑같다.
+- 지정된 key와 값을 저장
+- 이미 존재하는 키(key)이면 새로운 값(value)로 바꾼다.
   
-- getProperty()는 Properies에 저장된 값을 읽어오는 일을 한다.
-  - 만약 키가 존재하지 않으면 지정된 기본값 반환
+**String getProperty(String key)**
+
+**String getProperty(String key, String defaultValue)** 
+- Properies에 저장된 값을 읽어온다.
+- 만약 키(key)가 존재하지 않으면 지정된 기본값(defaultValue) 반환
   
-- Properies는 Hashtable을 상속받아 구현한 것이라 Map의 특성상 저장순서 유지하지 않는다.
-- Properies는 Collection framework 이전의 구버전이므로 Iterator가 아닌 Enumeration을 사용
-- 그리고 list메서드를 이용하면 Properies에 저장된 모든 데이터를 화면 또는 파일에 편리하게 출력할 수 있다.
-  - System.out은 화면과 연결된 표준출력으로 System클래스에 정의된 PrintStream타입의 static 변수이다.
+**Properies**는 Hashtable을 상속받아 구현한 것이라 **Map의 특성상 저장순서 유지하지 않는다.**
+- Properies는 Collection framework 이전의 구버전이므로 Iterator가 아닌 **Enumeration을 사용**
 
 
+**void list(PrintStream out)**
+
+**void list(PrintWriter out)**
+
+- Properies에 저장된 모든 데이터를 화면 또는 파일에 편리하게 출력할 수 있다.
+- System.out은 화면과 연결된 표준출력으로 System클래스에 정의된 PrintStream타입의 static 변수이다.
+
+**Set stringPropertyNames()** : Properies에 저장되어 있는 모든 key를 Set에 담아서 반환한다.
+
+[외부파일(input.txt)로부터 데이터를 입력받아서 계산결과를 보여주는 예제]
 
 ```java
 import java.io.*;
@@ -2794,19 +2861,24 @@ name=Seong Namkung
 data=9,1,5,2,8,13,26,11,35,1
 ```
 
-- 외부파일(input.txt)로부터 데이터를 입력받아서 계산결과를 보여주는 예제
-- 외부파일의 형식은 라인단위로 키와 값이 '='로 연결된 형태이어야 하며 주석라인은 첫 번째 문자가 #이어야 한다.
-- 정해진 규칙대로만 파일을 작성하면 load()를 호출하는 것만으로 쉽게 데이터를 읽어 올 수 있다.
-- 다만 인코딩문제로 한글이 깨질 수 있기 때문에 한글을 입력받으려면 아래와 같이 코드를 변경해야 한다.
+- **외부파일(input.text) 의 형식**은 **라인 단위**로 **키(key)와 값(value)** 가 **'=' 로 연결된 형태**이어야 한다. 
+- **주석라인**은 **첫 번째 문자가 #**이어야 한다.
+- 정해진 규칙대로만 파일을 작성하면 **load()** 를 호출하는 것만으로 쉽게 데이터를 읽어 올 수 있다.
+  - 다만, **인코딩(encoding)** 문제로 **한글이 깨질 수 있기 때문에** 한글을 입력받으려면 아래와 같이 코드를 변경해야 한다.
 
 ```java
 String name = prop.getProperty("name");
+
 try {
-		name = new String(name.getBytes("8859_1"), "EUC-KR");
-} catch(Exception e) {}
+	name = new String(name.getBytes("8859_1"), "EUC-KR");
+} catch(Exception e) {
+}
 ```
 
-- 읽어온 데이터의 인코딩을 라틴문자집합에서 한글완성형(EUC-KR 또는 KSC5601)으로 변환해주는 과정 추가
+- **읽어온 데이터의 인코딩**을 **라틴문자집합(8859_1)에서 한글완성형(EUC-KR 또는 KSC5601)으로 변환**해주는 과정을 추가한 것이다.
+  - **우리가 사용하는 OS의 기본 인코딩(encoding)** 이 **유니코드(unicode)가 아니라서** 이런 변환이 필요한 것 
+
+[Properties에 저장된 데이터를 store(), storeToXML() 를 이용해서 파일로 저장하는 예제]
 
 ```java
 import java.util.*;
@@ -2827,12 +2899,16 @@ class PropertiesEx3 {
 		} catch(IOException e) {
 			e.printStackTrace();		
 		}
-	} // mainŔÇ łĄ
+	}
 }
 ```
 
-- 반대로 Properties에 저장된 데이터를 store()와 storeToXML()를 이용해서 파일로 저장하는 방법
-- 한글문제가 발생 XML은 에디터 등에서 한글편집이 가능하므로 XML 사용 권장
+- 반대로 **Properties에 저장된 데이터** 를 **store(), storeToXML()** 를 이용해서 **파일로 저장**하는 방법
+- 한글 문제가 발생
+  - **storeToXml()을 이용하여 저장한 XML**은 **Eclipse, Editplus**에서 **한글 편집이 가능**
+  - 데이터에 한글이 포함된 경우, storeToXML()을 이용하여 XML로 작성하는 것이 좋다. 
+
+[시스템 속성을 가져오는 방법을 보여주는 예제]
 
 ```java
 import java.util.*;
@@ -2856,6 +2932,216 @@ java.runtime.name=~~
 sun.boot.library~
 ```
 
-- 시스템 속성을 가져오는 방법을 보여주는 예제
-- System 클래스의 getProperties()를 호출하면 시스템과 관련된 속성이 저장된 Properties 가져올수있다.
-- getProperty()를 통해 원하는 속성 얻을 수 있다.
+- **System 클래스의 getProperties()** 를 호출하면 **시스템과 관련된 속성이 저장된 Properties**를 가져올 수 있다.
+- **getProperty()** 를 통해 **원하는 속성**을 얻을 수 있다.
+
+## Collections
+
+**`Collections`**
+
+- Collections는 컬렉션과 관련된 메서드를 제공한다.
+  - Arrays는 배열과 관련된 메서드를 제공
+- fill(), copy(), sort(), binarySearch()와 같은 메서드들은 이미 설명했으므로 여기서는 설명을 생략
+  - Arrays의 메서드들과 같은 기능을 한다.
+- `java.util.Collection` : 인터페이스(interface)
+- `java.util.Collections` : 클래스(class)
+
+### 컬렉션의 동기화 - synchronized
+
+**멀티 쓰레드(Multi-Thread) 프로그래밍**에서는 **하나의 객체**를 **여러 쓰레드가 동시에 접근**할 수 있기 때문에 **데이터의 일관성(Consistency)** 을 유지하기 위해서는 **공유되는 객체**에 **동기화(Synchronous)가 필요**하다.
+
+- **Vector, HashTable**와 같은 **구버젼(JDK 1.2 이전)의 클래스들**은 **자체적으로 동기화 처리가 됨**
+  - Multi-Thread Programming이 아닌 경우엔 불필요한 기능이 되어버렸다. (동기화, 비동기화 선택 불가)
+
+- **새로 추가된 ArrayList, HashMap과 같은 컬렉션 클래스들**은 **동기화를 자체적으로 하지 않고** 필요한 경우에만 **`java.util.Collections클래스의 동기화 메서드`** 를 이용하여 처리가 가능 (동기화, 비동기화 선택 가능)
+
+**Collections클래스에는 동기화 메서드를 제공, 동기화가 필요한 경우에 사용하면 된다.**
+
+**[Collections클래스의 동기화 메서드]**
+
+```java
+static Collections synchronizedCollection(Collection c)
+static List synchroziedList(List list)
+static Set synchroziedSet(Set s)
+static Map synchroziedMap(Map m)
+static SortedSet synchroziedSortedSet(SortedSet s)
+static SortedMap synchroziedSortedMap(SortedMap m)
+```
+
+**[동기화 메서드를 사용하는 방법]**
+
+```java
+List syncList = Collections.synchroziedList(new ArrayList(...));
+```
+
+### 변경불가 컬렉션 만들기 - unmodifiable
+
+**컬렉션에 저장된 데이터를 보호**하기 위해서 **컬렉션을 변경할 수 없게, 즉 읽기 전용**으로 만들어야 할 때가 있다.
+- 주로 **Multi-Thread Programming**에서 **여러 쓰레드가 하나의 컬렉션을 공유**하다보면 **데이터가 손상**될 수 있다.
+
+이를 **방지**하기 위해서 **Collections클래스**에서 **데이터를 변경할 수 없게 읽기 전용으로 만드는 메서드들을 제공**한다.
+
+**[읽기 전용(변경불가)으로 만드는 메서드들]**
+
+```java
+static Collections unmodifiableCollection(Collection c)
+static List unmodifiableList(List list)
+static Set unmodifiableSet(Set s)
+static Map unmodifiableMap(Map m)
+static NavigableSet unmodifiableNavigableSet(NavigableSet s)
+static SortedSet unmodifiableSortedSet(SortedSet s)
+static NavigableMap unmodifiableNavigableMap(NavigableMap m)
+static SortedMap unmodifiableSortedMap(SortedMap m)
+```
+
+### 싱글톤(SingleTon) 컬렉션 만들기 - 단 하나의 객체만을 저장하는 컬렉션 - singleTon
+
+**단 하나의 객체만을 저장하는 컬렉션**을 만들고 싶은 경우, **싱글톤(SingleTon) 컬렉션 메서드를 사용**한다.
+- **매개변수로 저장할 요소를 지정** , **해당 요소를 저장하는 컬렉션을 반환**
+- **반환된 컬렉션은 변경 불가**
+
+**[단 하나의 객체만을 저장하는 컬렉션을 만드는 메서드들]**
+
+```java
+static List singletonList(Object o)
+static Set singleton(Object o) // singletonSet이 아님
+static Map singletonMap(Object key, Object value)
+```
+
+### 한 종류의 객체만 저장하는 컬렉션 만들기 - checked
+
+컬렉션에 모든 종류의 객체를 저장할 수 있다는 것은 장점이자 단점
+
+대부분의 경우, **한 종류의 객체를 저장** , **컬렉션에 지정된 종류의 객체만 저장할 수 있도록 제한**할 때 **checked종류 메서드를 사용**
+
+**[컬렉션에 지정된 종류의 객체만 저장할 수 있도록 제한하는 메서드들]**
+
+```java
+static Collections checkedCollection(Collection c, Class type)
+static List checkedList(List list, Class type)
+static Set checkedSet(Set s, Class type)
+static Map checkedMap(Map m, Class keytype, Class valueType)
+static Queue checkedQueue(Queue queue, Class type)
+static NavigableSet checkedNavigableSet(NavigableSet s, Class type)
+static SortedSet checkedSortedSet(SortedSet s, Class type)
+static NavigableMap checkedNavigableMap(NavigableMap m, Class keytype, Class valueType)
+static SortedMap checkedSortedMap(SortedMap m, Class keytype, Class valueType)
+```
+
+[사용방법]
+
+```java
+List list = new ArrayList();
+List checkedList = checkedList(list, String.class);
+checkedList.add("abc"); //ok
+checkedList.add(new Integer(3)); // 에러, ClassCastException 발생
+```
+
+**두 번째 매개변수**에 **저장할 객체의 클래스를 지정**
+- **컬렉션에 저장할 요소의 타입을 제한**하는 것 : **지네릭스(Generics)로 처리 가능**
+  - 그럼에도 이런 메서드들을 제공하는 이유 : **호환성** 
+
+
+### addAll(), rotate(), swap(), shuffle(), sort(), binarySearch(), max(), min(), fill(), nCopies(), disjoint(), copy(), replaceAll()
+
+```java
+import java.util.*;
+import static java.util.Collections.*;
+
+class CollectionsEx {
+	public static void main(String[] args) {
+		List list = new ArrayList();
+		System.out.println(list);
+		
+		addAll(list, 1,2,3,4,5);
+		System.out.println(list);
+		
+		rotate(list, 2);	// 오른쪽으로 두 칸씩 이동
+		System.out.println(list);
+		
+		swap(list, 0, 2);	// 첫 번째와 세 번째를 교환(swap)
+		System.out.println(list);
+		
+		shuffle(list);		// 저장된 요소의 위치를 임의로 변경
+		System.out.println(list);
+		
+		sort(list);
+		System.out.println(list);
+		
+		sort(list, reverseOrder());	// 역순 정렬 reverse(list);와 동일
+		System.out.println(list);
+		
+		int idx = binarySearch(list, 3);	// 3이 저장된 위치(index)를 반환
+		System.out.println("index of 3 = " + idx);
+		
+		System.out.println("max = " + max(list));
+		System.out.println("min = " + min(list));
+		System.out.println("min = " + max(list, reverseOrder()));
+		
+		fill(list, 9);	// list를 9로 채움
+		System.out.println("list = " + list);
+		
+		// list와 같은 크기의 새로운 list를 생성하고 2로 채운다. 단, 결과는 변경 불가
+		List newList = nCopies(list.size(), 2);
+		System.out.println("newList = " + newList);
+		
+		System.out.println(disjoint(list, newList));		// 공통요소가 없으면 true
+		
+		copy(list, newList);
+		System.out.println("newList = " + newList);
+		System.out.println("list = " + list);
+		
+		replaceAll(list, 2, 1);
+		System.out.println("list = " + list);
+		
+		Enumeration e = enumeration(list);
+		ArrayList list2 = list(e);
+		
+		System.out.println("list2 = " + list2);
+	}
+}
+```
+
+```json
+실행결과
+[]
+[1,2,3,4,5]
+[4,5,1,2,3]
+[1,5,4,2,3]
+[4,1,2,3,5]
+[5,4,3,2,1]
+[1,2,3,4,5]
+index of 3 = 2
+max=5
+min=1
+min=1
+list=[9,9,9,9,9]
+newList=[2,2,2,2,2]
+true
+newList=[2,2,2,2,2]
+list=[2,2,2,2,2]
+list=[1,1,1,1,1]
+list2=[1,1,1,1,1]
+```
+
+## 컬렉션 클래스 정리 & 요약
+
+![컬렉션 클래스간의 관계](https://user-images.githubusercontent.com/56071088/127686159-c7626481-0ad1-472b-af0e-874aa47e64c2.png)
+
+|컬렉션|특징|
+|---|---|
+|ArrayList|**배열기반, 데이터의 추가와 삭제에 불리, 순차적인 추가,삭제는 제일 빠름, 임의의 요소에 대한 접근성(accessibility)가 뛰어남**|
+|LinkedList|**연결기반, 데이터의 추가와 삭제에 유리, 임의의 요소에 대한 접근성이 좋지 않다.**|
+|HashedMap|**배열과 연결리스트가 결합된 형태, 추가, 삭제, 검색, 접근성이 모두 뛰어남, 검색에는 최고 성능**|
+|TreeMap|**연결기반, 정렬과 검색(특히 범위 검색)에 적합, 검색 성능은 HashedMap보다 떨어짐**|
+|Stack|**Vector**를 **상속**받아 구현|
+|Queue|**LinkedList**가 **Queue인터페이스를 구현**|
+|Properties|HashTable을 상속받아 구현|
+|HashSet|HashMap을 이용해서 구현|
+|TreeSet|TreeMap을 이용해서 구현|
+|LinkedHashMap, LinkedHashSet| HashMap과 HashSet에 **저장순서유지기능**을 추가|
+
+
+
+
+
