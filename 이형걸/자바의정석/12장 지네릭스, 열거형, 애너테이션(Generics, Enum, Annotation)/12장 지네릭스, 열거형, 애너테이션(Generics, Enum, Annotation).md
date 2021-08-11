@@ -66,7 +66,7 @@ b.setItem(new Object())  // 에러, String이외에 타입은 지정불가
 b.setItem("ABC")  // ok
 String item = b.getItem(); // (String)b.getItem(); 처럼 형변환이 필요없음 
 
-class Box<String> { // 지네릭 타입을 String으로 지정
+class Box { // 지네릭 타입을 String으로 지정
     String item;
 
     void setItem(String item) {
@@ -528,6 +528,104 @@ Collections.sort(grapeBox.getList(), new FruitComp());
 ```
 
 FruitComp하나로 모든 Fruit의 Box정렬 가능
+
+[<? super T> : 와일드 카드의 하한을 제한하는 Collections.sort() 예시]
+
+```java
+import java.util.*;
+
+class Fruit	{
+	String name;
+	int weight;
+	
+	Fruit(String name, int weight) {
+		this.name   = name;
+		this.weight = weight;
+	}
+
+	public String toString() { return name+"("+weight+")";}
+	
+}
+
+class Apple extends Fruit {
+	Apple(String name, int weight) {
+		super(name, weight);
+	}
+}
+
+class Grape extends Fruit {
+	Grape(String name, int weight) {
+		super(name, weight);
+	}
+}
+
+class AppleComp implements Comparator<Apple> {
+	public int compare(Apple t1, Apple t2) {
+		return t2.weight - t1.weight;
+	}
+}
+
+class GrapeComp implements Comparator<Grape> {
+	public int compare(Grape t1, Grape t2) {
+		return t2.weight - t1.weight;
+	}
+}
+
+class FruitComp implements Comparator<Fruit> {
+	public int compare(Fruit t1, Fruit t2) {
+		return t1.weight - t2.weight;
+	}
+}
+
+class FruitBoxEx4 {
+	public static void main(String[] args) {
+		FruitBox<Apple> appleBox = new FruitBox<Apple>();
+		FruitBox<Grape> grapeBox = new FruitBox<Grape>();
+
+		appleBox.add(new Apple("GreenApple", 300));
+		appleBox.add(new Apple("GreenApple", 100));
+		appleBox.add(new Apple("GreenApple", 200));
+
+		grapeBox.add(new Grape("GreenGrape", 400));
+		grapeBox.add(new Grape("GreenGrape", 300));
+		grapeBox.add(new Grape("GreenGrape", 200));
+
+		Collections.sort(appleBox.getList(), new AppleComp());
+		Collections.sort(grapeBox.getList(), new GrapeComp());
+		System.out.println(appleBox);
+		System.out.println(grapeBox);
+		System.out.println();
+		Collections.sort(appleBox.getList(), new FruitComp());
+		Collections.sort(grapeBox.getList(), new FruitComp());
+		System.out.println(appleBox);
+		System.out.println(grapeBox);
+	}  // main
+}
+
+class FruitBox<T extends Fruit> extends Box<T> {}
+
+class Box<T> {
+	ArrayList<T> list = new ArrayList<T>();
+
+	void add(T item) {
+		list.add(item);
+	}
+
+	T get(int i) {
+		return list.get(i);
+	}
+
+	ArrayList<T> getList() { return list; }
+
+	int size() {
+		return list.size();
+	}
+
+	public String toString() {
+		return list.toString();
+	}
+}
+```
 
 ## 지네릭 메서드
 
@@ -1350,8 +1448,7 @@ abstract class MyTransportation extends MyEnum {
 		int fare(int distance) { return distance * BASIC_FARE; }
 	};
 
-    static final MyTransportation AIRPLANE = 
-                                           new MyTransportation("AIRPLANE", 300) {
+    static final MyTransportation AIRPLANE = new MyTransportation("AIRPLANE", 300) {
 		int fare(int distance) { return distance * BASIC_FARE; }
 	};
 
@@ -1416,7 +1513,10 @@ Java를 개발한 사람들은 소스코드에 대한 문서를 따로 만들기
 
 **JDK에서 제공하는 표준 애너테이션**은 **새로운 애너테이션을 정의할 때** 사용하는 **메타 에너테이션도 제공**한다.
 
-## 표준 애너테이션
+## 표준 애너테이션 
+
+- 빌트인
+- 메타 애너테이션
 
 자바에서 기본적으로 제공하는 애터네이션들은 몇 개 없다
 - **`메타 애너테이션(meta annotation)`** : 에너테이션을 정의하는데 사용되는 애너테이션의 애너테이션
@@ -1441,6 +1541,50 @@ Java를 개발한 사람들은 소스코드에 대한 문서를 따로 만들기
 - 이 애너테이션이 붙은 대상은 다른 것으로 대체되었으니 더 이상 사용하지 않을 것을 권한다는 의미이다.
 
 ![Deprecated 사용 예시](https://user-images.githubusercontent.com/56071088/128184024-8d857b9d-fea1-4afc-a650-5f50aa889213.png)
+
+해당 소스파일이 `deprecated`된 대상을 사용하고 있으며, **`Xlint:deprecation`** 옵션을 붙여서 **다시 컴파일하면 자세한 내용을 알 수 있다는 뜻**이다.
+
+[@Deprecated 사용 예시]
+
+```java
+class NewClass{
+	int newField;
+
+	int getNewField() { 
+		return newField;
+	}	
+
+	@Deprecated
+	int oldField;
+
+	@Deprecated
+	int getOldField() { 
+		return oldField;
+	}
+}
+
+class AnnotationEx2 {
+	public static void main(String args[]) {
+		NewClass nc = new NewClass();
+
+		nc.oldField = 10; //@Depreacted가 붙은 대상을 사용
+		System.out.println(nc.getOldField()); //@Depreacted가 붙은 대상을 사용
+	}
+}
+```
+
+```json
+c:\jdk1.8\work\ch12\javac AnnotaionEx2.java
+Note: AnnotationEx2.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+c:\jdk1.8\work\ch12\java AnnotationEx2
+10
+```
+
+`@Deprecated`가 붙은 대상을 사용하여 고의적으로 위의 메시지가 나타나도록 했다.
+
+**메시지가 나타났지만 컴파일도 실행도 잘되었다.** `@Deprecated`가 붙은 대상을 사용하지 않도록 권할 뿐 **강제성은 없기 때문이다.**
 
 ### @FunctionalInterface
 
@@ -1483,6 +1627,10 @@ list.add(obj)                     // 여기서 경고가 발생
 @SuppressWarnings({"unchecked", "deprecation", "rawtypes", "varargs"})
 ```
 
+`@SuppressWarnings`로 억제할 수 있는 경고 메시지의 종류는 **JDK의 버젼이 올라가면서 계속 추가**될 것이기 때문에, **이전 버젼에서는 발생하지 않던 경고가 새로운 버젼에서 발생할 수 있다.**
+
+새로 추가된 경고 메시지를 억제하려면, 경고 메시지의 종류를 알아야 하는데, **`-Xlint`** 옵션으로 **컴파일** 해서 나타나는 **경고의 내용 중**에서 **대괄호[] 안**에 있는 것이 바로 **메시지의 종류다.**
+
 [@SuppressWarnings 사용 예제]
 
 ```java
@@ -1523,4 +1671,188 @@ class AnnotationEx3 {
 - 해당 대상에만 애너테이션을 붙여서 경고의 억제범위를 최소화하는 것이 좋다.
 
 ### @SafeVarargs
+
+**메서드에 선언된 가변인자의 타입**이 `non-reifiable` 타입일 경우, **해당 메서드를 선언하는 부분과 호출하는 부분에서** `unchecked` 경고가 발생한다.
+
+해당 코드에 문제가 없다면 이러한 경고를 억제하기 위해 **`SafeVarargs`** 를 사용해야 한다.
+
+- `reifiable 타입` : 컴파일 후에도 제거되지 않는 타입, **컴파일 후에도 타입 정보가 유지되는 타입** 
+  - reifiable : 다시 ~화(化) 할 수 있는
+- `non-reifiable 타입` : **컴파일 후에 제거되는 타입**
+  - 지네릭 타입들은 대부분 컴파일 시에 제거되므로 non-refiable타입이다.
+
+**@SafeVarargs 애너테이션**은 **static이나 final이 붙은 메서드와 생성자**에만 붙일 수 있다. 즉, **오버라이딩 될 수 있는 메서드에는 사용할 수 없다**는 뜻이다.
+
+[java.util.Arrays의 asList() 예시]
+
+```java
+// 이 메서드는 매개변수로 넘겨받은 값들로 배열을 만들어서 새로운 ArrayList객체를 만들어서 반환하는데 이 과정에서 경고가 발생한다.
+public static <T> List<T> asList(T... a) {
+	return new ArrayList<T>(a); // ArrayList(E[] array)를 호출. 경고 발생
+}
+```
+
+asList()의 매개변수가 가변인자인 동시에 지네릭 타입이다. 메서드에 선언된 타입 T는 Object로 바뀐다.
+- 즉, Object[]가 된다.
+- Object[] 에는 모든 타입의 객체가 들어올 수 있으므로, 이 배열로 ArrayList< T> 를 생성하는 것은 위험하다고 경고를 하는 것
+
+그러나 asList()가 호출되는 부분을 컴파일러가 테해서 타입 T가 아닌 다른 타입이 들어가지 못하게 할 것이므로 위의 코드는 아무런 문제가 없다!!
+- 이럴 때는 메서드 앞에 **`@SafeVarargs`** 를 붙이면, 이 메서드를 호출하는 곳에서 발생하는 경고도 억제된다.
+
+- **`@SafeVarargs`** : 메서드 선언뿐만 아니라 메서드가 호출되는 곳에도 발생하는 경고도 억제
+- **`@SuppressWarnings("unchecked")`** : 메서드를 선언하는 곳과 호출하는 부분에 각각 따로 똑같이 붙여줘야 한다.
+
+**`@SafeVarargs`** 로 **`unchecked`** 경고는 억제할 수 있지만, **`varargs`** 경고는 억제할 수 없기 때문에 **습관적으로 @SafeVarargs, @SuppressWarnings("varargs")를 같이 붙인다.**
+
+```java
+@SafeVarargs // 'unchecked' 경고를 억제한다.
+@SuppressWarnings("varargs") // 'varargs' 경고를 억제한다.
+public static <T> List<T> asList(T... a) {
+	return new ArrayList<T>(a); // ArrayList(E[] array)를 호출. 경고 발생
+}
+```
+
+[@SafeVarargs 어노테이션 사용 예제]
+
+```java
+import java.util.Arrays;
+
+class MyArrayList<T> {
+	T[] arr;
+
+	@SafeVarargs
+	@SuppressWarnings("varargs")
+	MyArrayList(T... arr) {
+		this.arr = arr;
+	}
+	
+	@SafeVarargs
+//	@SuppressWarnings("unchecked")
+	public static <T> MyArrayList<T> asList(T... a) { 
+        return new MyArrayList<>(a);
+    }
+
+	public String toString() {
+		return Arrays.toString(arr);
+	}
+}
+
+class AnnotationEx4 {
+//	@SuppressWarnings("unchecked")
+	public static void main(String args[]) {
+		MyArrayList<String> list = MyArrayList.asList("1","2","3");
+
+		System.out.println(list);
+	}
+}
+```
+
+## 메타 애너테이션
+
+**`메타 애너테이션`** : `어노테이션을 위한 어노테이션`, 즉, **어노테이션을 붙이는 어노테이션으로 정의**할 때 **어노테이션의 적용대상(target)이나 유지기간(retention)등을 지정하는데 사용**된다.
+- 메타 어노테이션은 **java.lang.Annotation패키지**에 포함되어 있다.
+
+### @Target
+
+**`@Target`** : **어노테이션이 적용가능한 대상을 지적**하는데 사용된다.
+
+[@Target을 이용한 @SuppressWarnings 정의 예시]
+
+```java
+@Target({TYPE, FIELD, METHOD, PARAMETER})
+@Retention(RetentionPolicy.SOURCE)
+public @interface SuppressWarnings {
+		String[] value();
+}
+```
+
+- 여러 개의 값을 지정할 때는 **배열에서처럼 괄호{}를 사용**해야 한다.
+
+[@Target으로 지정할 수 있는 애너테이션 적용대상의 종류]
+
+![@Target](https://user-images.githubusercontent.com/56071088/128487420-5fcf7400-8fb6-498a-bc3e-068a44e8a53f.png)
+
+위의 표는 **java.;ang.annotation.ElementType**이라는 **열거형**에 정의되어 있다.
+- **static import문**을 사용하면 `ElementType.TYPE -> TYPE`와 같이 간단하게 사용할 수 있다.
+
+- **`TYPE`** : **타입을 선언**할 때, 애너테이션을 붙일 수 있다. 
+- **`TYPE_USE`** : **해당 참조형 타입의 변수**를 **선언**할 때 붙일 수 있다.
+- **`FIELD`** : **해당 기본형 타입을 선언**할 때. 어노테이션을 붙일 수 있다.
+
+```java
+import static java.lang.annotation.ElementType.*;
+
+@Target({TYPE, TYPE_USE, FIELD}) // 적용 대상
+public @interface MyAnnotation { } // MyAnnotation 정의
+
+@MyAnnotation // 적용대상 TYPE
+class MyClass {
+	@MyAnnotation // 적용대상 FIELD
+	int i;
+	
+	@MyAnnotation // 적용대상 TYPE_USE인 경우
+	Myclass mc;
+}
+```
+
+### @Retention
+
+**`@Retention`** : **어노테이션이 유지되는 기간을 지정**하는데 사용된다.
+
+[@Retention어노테이션의 유지 정책(retention policy)]
+
+![@Retention](https://user-images.githubusercontent.com/56071088/128488776-a4f5b4b2-a59b-4823-986c-9f142eab8a98.png)
+
+#### SOURCE
+
+**`SOURCE`** : **소스파일(.java)에만 존재. 클래스파일(.class)에는 존재하지 않음.**
+- `@Override`, `@SuppressWarnings` 처럼 컴파일러가 사용하는 어노테이션은 **유지 정책이 SOURCE**이다.
+- 컴파일러를 직접 작성하는 것이 아니면, 이 유지정책은 필요없다.
+
+#### RUNTIME
+
+**`RUNTIME`** : **클래스파일(.class)에만 존재. 실행시에 사용가능**
+- 유지정책을 `RUNTIME`으로 하면, **실행시에 리플렉션(reflection)** 을 통해 **클래스 파일(.class)에 저장된 애너테이션의 정보를 읽어서 처리**할 수 있다.
+  - `@FunctionalInterface`는 @Override처럼 컴파일러가 체크해주는 애너테이션이지만, **실행 시에도 사용**되므로 **유지정책이 RUNTIME**이다.  
+
+#### CLASS
+
+**`CLASS`** : **클래스파일(.class)에만 존재. 실행시에 사용불가. 기본값**
+- 컴파일러가 애너테이션의 정보를 클래스파일에 저장할 수 있게 하지만, 클래스파일이 JVM에 로딩될 때는 애너테이션의 정보가 무시되어 실행 시에 애너테이션에 대한 정보를 얻을 수 없다.
+- 이것이 `CLASS`가 유지정책의 기본값임에도 불구하고 잘 사용되지 않는 이유이다.
+
+**지역변수에 붙은 애너테이션은 컴파일러만 인식할 수 있으므로, 유지정책이 RUNTIME인 애너테이션을 지역변수에 붙여도 실행 시에는 인식되지 않는다.**
+
+### @Documented
+
+**`@Documented`** : **애너테이션에 대한 정보가 javadoc으로 작성한 문서에 포함**되도록 한다.
+- Java에서 제공하는 기본 애너테이션 중에 **@Override, @SuppressWarnings**를 제외하고는 모두 이 메타애너테이션이 붙어 있다.
+
+[@Documented 예시]
+
+```java
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface FunctionalInterface {}
+```
+
+### @Inherited
+
+**`@Inherited`** : **애너테이션이 자손 클래스에 상속되도록 한다.**
+- **@Inherited가 붙은 애너테이션을 조상 클래스**에 붙이면, **자손 클래스에도 이 애너테이션이 붙은 것과 같이 인식**된다.
+
+```java
+@Inherited  // @SupperAnno가 자손까지 영향 미치게
+@interface SupperAnno {} 
+
+@SupperAnno
+class Parent {}
+class Child extends Parent {} // Child에 애너테이션이 붙은 것으로 인식
+```
+
+### @Repeatable
+
+
+
   
