@@ -3007,3 +3007,271 @@ class StreamEx8 {
 [1-3][HIGH, MID]
 [2-3][HIGH, MID]
 ```
+
+## Collector 구현하기
+
+Collector를 구현한다는 것은 **Collector 인터페이스(interface)** 를 구현한다는 것을 의미
+
+```java
+public interface Collector<T, A, R> {
+	Supplier<A> supplier();
+	BiConsumer<A, T> accumulator();
+	BinaryOperator<A> combiner();
+	Function<A, R> finisher();
+
+	Set<Characteristics> characterisitcs(); // 컬렉터의 특성이 담긴 Set을 반환
+	...
+}
+```
+
+- 직접 구현해야하는 것은 5개의 메서드
+- characterisitcs() 를 제외하면 모두 반환형이 **함수형 인터페이스**
+  - **즉, 4개의 람다식(lambda expression)** 을 작성하면 되는 것이다.
+
+```java
+supplier()  : 작업 결과를 저장할 공간을 제공
+accumulator() : 스트림의 요소를 어떻게 supplier()가 제공할 공간에 수집(collect)할 것인가를 정의
+combiner() : 두 저장공간을 병합할 방법을 제공(병렬 스트림), 여러 쓰레드에 의해 처리된 결과를 어떻게 합칠 것인가를 정의
+finisher() : 결과를 최종적으로 변환할 방법을 제공, 작업 결과를 변환하는 일을 하는데 변환이 필요없다면, 항등 함수인 Function.identity()를 반환하면 된다.
+```
+
+```java
+public Function finisher() {
+	return Function.identity(); // 항등 함수를 반환. return x -> x; 와 동일
+}
+```
+
+
+
+- characterisitcs() : **컬렉터가 수행하는 작업의 속성**에 대한 정보를 제공하기 위한 것
+
+```java
+Characteristics.CONCURRENT : 병렬로 처리할 수 있는 작업
+Characteristics.UNORDERED : 스트림의 요소의 순서가 유지될 필요가 없는 작업
+Characteristics.IDENTITY_FINISH : finisher()가 함등 함수인 작업
+
+위의 3가지 속성 중에서 해당하는 것을 Set에 담아서 반환하도록 구현하면 된다.
+
+열거형 Characvterisitcs 는 Collector 내에 정의되어 있다.
+```
+
+```java
+public Set<Characvterisitcs> characteristics() {
+	return Collections.unmodifiableSet(EnumSet.of(
+		Collector.Characteristics.CONCURRENT,
+		Collector.Characterisitcs.UNORDERED
+	));
+}
+
+// 아무런 속성을 지정하고 싶지 않을 때
+Set<Characvterisitcs> characteristics() {
+	return Collections.emptySet(); // 지정할 특성이 없는 경우 비어있는 Set을 반환
+}
+```
+
+- 결국 Collector도 내부적으로 처리하는 과정이 reducing과 같다는 것을 의미
+  - finisher()를 제외하고 supplier(), accumulator(), combiner()는 모두 앞서 reducing에 나왔던 개념들이다.
+
+- IntStream의 count(), sum(), max(), min()등이 reduce()로 구현되어 있다.
+- collect()로도 count()와 같은 기능을 수행할 수 있다.
+
+```java
+long count = stuStream.count();
+long count = stuStream.collect(counting());
+```
+
+#### reduce()와 collect()의 차이점
+
+- 이 둘은 근본적으로 하는 일은 같다.
+- collect() : 그룹화와 분할, 집계 등에 유용하게 쓰이고,
+  - 병렬화에 있어서 reduce()보다 collect()가 더 유리하다.
+- 결론적으로, reduce()에 대해서 잘 이해했다면, Collector를 구현하는 일이 어렵지 않을 것이다.
+
+
+**[String배열의 모든 문자열을 하나의 문자열로 합치는 예제]**
+
+- 이 기능을 하는 Collector를 Customizing 해보자
+
+```java
+String[] strArr = {"aaa", "bbb", "ccc"};
+StringBuffer sb = new StringBuffer(); // supplier() 저장할 공간을 생성
+
+for(String temp : strArr) {
+	sb.append(temp); // accumulator(), sb에 요소를 저장
+}
+
+String result = sb.toString(); // finisher(), StringBuffer를 String으로 변환
+```
+
+-->
+
+```java
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
+
+class CollectorEx1 {
+	public static void main(String[] args) {
+		String[] strArr = { "aaa","bbb","ccc" };
+		Stream<String> strStream = Stream.of(strArr);
+
+		String result = strStream.collect(new ConcatCollector());
+
+		System.out.println(Arrays.toString(strArr));
+		System.out.println("result="+result);
+	}
+}
+
+class ConcatCollector implements Collector<String, StringBuilder, String> {
+	@Override
+	public Supplier<StringBuilder> supplier() {
+		return () -> new StringBuilder();
+//		return StringBuilder::new;
+	}
+
+	@Override
+	public BiConsumer<StringBuilder, String> accumulator() {
+		return (sb, s) -> sb.append(s);
+//		return StringBuilder::append;
+	}
+
+	@Override
+	public Function<StringBuilder, String> finisher() {
+		return sb -> sb.toString();
+//		return StringBuilder::toString;
+	}
+
+	@Override
+	public BinaryOperator<StringBuilder> combiner() {
+		return (sb, sb2)-> {
+			sb.append(sb2);
+			return sb;
+		};
+	}
+
+	@Override
+	public Set<Characteristics> characteristics() {
+		return Collections.emptySet();
+	}
+}
+```
+
+```java
+실행결과
+[aaa, bbb, ccc]
+result = aaabbbccc
+```
+
+## 스트림의 변환
+
+스트림간의 변환에 있어서 어떤 메서드를 써야할지 혼동이 올 때 참고하면 좋을 듯 하다.
+
+**[스트림 변환에 사용되는 메서드]**
+
+1. 스트림 -> 기본형 스트림
+
+|from|to|변환메서드|
+|---|---|---|
+|Stream < T>|IntStream|mapToInt(ToIntFunction< T> mapper)|
+|Stream < T>|LongStream|mapToLong(ToLongFunction< T> mapper)|
+|Stream < T>|DoubleStream|mapToDouble(ToDoubleFunction< T> mapper)|
+
+2. 기본형 스트림 -> 스트림 
+
+|from|to|변환메서드|
+|---|---|---|
+|IntStream|Stream< Integer>|boxed()|
+|LongStream|Stream< Long>|boxed()|
+|DoubleStream|Stream< Long>|boxed()|
+|IntStream, LongStream, DoubleStream|Stream< U>|mapToObj(DoubleFunction< U> mapper)|
+
+3. 기본형 스트림 -> 기본형 스트림
+
+|from|to|변환메서드|
+|---|---|---|
+|IntStream|||
+|LongStream|LongStream|asLongStream()|
+|DoubleStream|Stream< Long>|asDoubleStream()|
+
+4. 스트림 -> 부분 스트림
+
+|from|to|변환메서드|
+|---|---|---|
+|Stream< T>|Stream< T>|skip(long n)|
+|IntStream|IntStream|limit(long maxSize)|
+
+5. 2개의 스트림 -> 스트림
+
+|from|to|변환메서드|
+|---|---|---|
+|Stream< T>, Stream< T>|Stream< T>|concat(Stream< T> a, Stream< T> b)|
+|IntStream, IntStream|IntStream|concat(IntStream a, IntStream b)|
+|LongStream, LongStream|LongStream|concat(LongStream a, LongStream b)|
+|DoubleStream, DoubleStream|DoubleStream|concat(DoubleStream a, DoubleStream b)|
+
+6. 스트림의 스트림 -> 스트림
+
+|from|to|변환메서드|
+|---|---|---|
+|Stream< Stream< T>>|Stream< T>|flatMap(Function mapper)|
+|Stream< IntStream>|IntStream|flatMapToInt(Function mapper)|
+|Stream< LongStream>|LongStream|flatMapToLong(Function mapper)|
+|Stream< DoubleStream>|DoubleStream|flatMapToDouble(Function mapper)|
+
+7. 스트림 <-> 병렬 스트림
+
+|from|to|변환메서드|
+|---|---|---|
+|Stream< T>|Stream< T>|parallel() // 스트림 -> 병렬 스트림|
+|IntStream|IntStream|sequential() // 병렬 스트림 -> 스트림|
+|LongStream|LongStream|위의 메서드들과 동일|
+|DoubleStream|DoubleStream|위의 메서드들과 동일|
+
+8. 스트림 -> 컬렉션
+
+|from|to|변환메서드|
+|---|---|---|
+|Stream< T>, IntStream, LongStream, DoubleStream|Collection< T>|collect(Collectors.toCollection(Supplierfactory)) |
+|Stream< T>, IntStream, LongStream, DoubleStream|List< T>|collect(Collectors.toList())|
+|Stream< T>, IntStream, LongStream, DoubleStream|Set< T>|collect(Collectors.toSet())|
+
+
+9. 컬렉션 -> 스트림
+
+|from|to|변환메서드|
+|---|---|---|
+|Collection< T>, List< T>, Set< T>|Stream< T>|stream() |
+
+10. 스트림 -> Map
+
+|from|to|변환메서드|
+|---|---|---|
+|Stream< T>, IntStream, LongStream, DoubleStream|Map< K,V>|collect(Collectors.toMap(Function key, Function value)) |
+|Stream< T>, IntStream, LongStream, DoubleStream|Map< K,V>|collect(Collectors.toMap(Function k, Function v, BinaryOperator)) |
+|Stream< T>, IntStream, LongStream, DoubleStream|Map< K,V>|collect(Collectors.toMap(Function k, Function v, BinaryOperator merge, Supplier mapSupplier)) |
+
+11. 스트림 -> 배열
+
+|from|to|변환메서드|
+|---|---|---|
+|Stream< T>|Object[]|toArray()|
+|Stream< T>|T[]|toArray(IntFunction< A[]>) generator|
+|IntStream, LongStream, DoubleStream|int[], long[], double[]|toArray()|
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
