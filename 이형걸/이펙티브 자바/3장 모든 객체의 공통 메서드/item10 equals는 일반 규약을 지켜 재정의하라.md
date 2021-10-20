@@ -44,7 +44,7 @@ public boolean equals(Objet obj) {
 
 ## equals를 재정의해야 하는 상황
 
-```json
+```java
 객체 식별성(object identity : 두 객체가 물리적으로 같은가)이 아니라 논리적 동치성(logical equality)를 확인해야 하는데,
 
 상위 클래스의 equals가 논리적 동치성을 비교하도록 재정의되지 않았을 때다.
@@ -203,7 +203,7 @@ public boolean equals(Object o) {
 - **Point의 하위 클래스는 어디서든 Point로써 활용될 수 있어야 하는데**, 이 방식은 그렇지 못하기에 활용할 수 없음
 - **`리스코프 치환 원칙(LSP) 위배`**
 
-```json
+```java
 리스코프 치환 원칙(Liskov Substitution Principle) : 어떤 타입에 있어 중요한 속성이라면 그 하위 타입에서도 마찬가지로 중요하다. 따라서 그 타입의 모든 메서드가 하위 타입에도 똑같이 잘 작동해야 한다.
 - Point의 하위 클래스는 정의상 여전히 Point이므로 어디서든 Point로써 활용될 수 있아야 한다. 는 말이다.
 ```
