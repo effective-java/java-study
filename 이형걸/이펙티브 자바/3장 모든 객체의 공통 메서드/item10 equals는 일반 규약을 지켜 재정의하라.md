@@ -44,11 +44,9 @@ public boolean equals(Objet obj) {
 
 ## equals를 재정의해야 하는 상황
 
-```java
-객체 식별성(object identity : 두 객체가 물리적으로 같은가)이 아니라 논리적 동치성(logical equality)를 확인해야 하는데,
 
-상위 클래스의 equals가 논리적 동치성을 비교하도록 재정의되지 않았을 때다.
-```
+### 객체 식별성(object identity : 두 객체가 물리적으로 같은가)이 아니라 논리적 동치성(logical equality)를 확인해야 하는데, 상위 클래스의 equals가 논리적 동치성을 비교하도록 재정의되지 않았을 때다.
+
 - 주로 **값 클래스**
 - EX) `Integer, String`
 
