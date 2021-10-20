@@ -194,9 +194,9 @@ public boolean equals(Object o) {
 public boolean equals(Object o) {
     if (o == null || o.getClass() != getClass())
         return false;
-        Point p = (Point) o;
-        return p.x == x && p.y == y;
-    }
+    Point p = (Point) o;
+    return p.x == x && p.y == y;
+}
 ```
     
 - **같은 구현 클래스의 객체와 비교할 때만 true를 반환함**
@@ -209,6 +209,9 @@ public boolean equals(Object o) {
 ```
 
 ### **괜찮은 우회방법 - 상속 대신 컴포지션을 사용(item18)**
+
+- **Point를 ColorPoint의 private 필드**로 두고, 
+- **ColorPoint와 같은 위치의 일반 Point를 반환하는 뷰(view) 메소드를 public으로 추가(asPoint())**
 
 ```java
 // equals 규약을 지키면서 값 추가하기
@@ -236,15 +239,13 @@ public class ColorPoint {
     ...
 }
 ```
+  
+Java Library(API)에도 구체 클래스를 확장해 값을 추가한 클래스가 있음
+- ex. `java.sql.TimeStamp` - `java.util.Date` 를 확장하고 nanoseconds 필드 추가
+  - TimeStamp의 equals는 대칭성을 위배하여 Date와 섞어 쓸 때 주의해야 함
+  - 둘을 명확히 분리하여 사용한다면 상관없지만, 섞이지 않도록 보장해줄 수단은 없음
 
-- **Point를 ColorPoint의 private 필드**로 두고, 
-- **ColorPoint와 같은 위치의 일반 Point를 반환하는 뷰(view) 메소드를 public으로 추가(asPoint())**
-- Java 라이브러리에도 구체 클래스를 확장해 값을 추가한 클래스가 있음
-  - ex. `java.sql.TimeStamp` - `java.util.Date` 를 확장하고 nanoseconds 필드 추가
-    - TimeStamp의 equals는 대칭성을 위배하여 Date와 섞어 쓸 때 주의해야 함
-    - 둘을 명확히 분리하여 사용한다면 상관없지만, 섞이지 않도록 보장해줄 수단은 없음
-
-```json
+```java
 추상클래스의 하위 클래스라면 equals 규약을 지키면서도 값을 추가 할 수 있음. → 상위 클래스를 직접 인스턴스화 할 수 없다면 지금까지의 문제들은 일어나지 않음
 ```
 
@@ -257,9 +258,9 @@ public class ColorPoint {
   - **문제를 일으키지 않으려면 equals는 항시 메모리에 존재하는 객체만을 사용한 결정적 계산만 수행해야 한다!!**
   
 ### 5. **null-아님** : null이 아닌 모든 참조 값 x에 대해, x.equals(null)은 false다.
-
 - 모든 객체가 null과 같지 않아야 함
-- 명시적 null 검사 → 필요없음
+
+명시적 null 검사 → 필요없음
 
 ```java
 @Override
@@ -269,7 +270,9 @@ public boolean equals(Object o){
 }
 ```
 
-- 묵시적 null 검사 - 이쪽이 낫다.
+묵시적 null 검사 - 이쪽이 낫다.
+- **instanceof는 두 번째 피연산자와 무관하게 첫번째 피연산자가 null이면 false 반환하기 때문에**
+- **null 검사를 명시적으로 하지 않아도 됨**
 
 ```java
 @Override
@@ -280,10 +283,6 @@ public boolean equals(Object o){
     ...
 }
 ```
-
-- **instanceof는 두 번째 피연산자와 무관하게 첫번째 피연산자가 null이면 false 반환하기 때문에**
-- **null 검사를 명시적으로 하지 않아도 됨**
-
 
 **위의 규약들은 equals를 재정의할 때 무적권 지켜야 한다!!**
 
@@ -348,6 +347,7 @@ public final class PhoneNumber {
         // 3. 입력을 올바른 타입으로 형변환(Casting)한다.
         PhoneNumber pn = (PhoneNumber)o;
         
+        // 4. 적절한 비교 연산자 사용(여기서는 기본 타입 필드이므로 == 사용)
         return pn.lineNum == lineNum && pn.prefix == prefix
                 && pn.areaCode == areaCode;
     }
