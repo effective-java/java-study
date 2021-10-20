@@ -60,9 +60,9 @@ public boolean equals(Objet obj) {
 
 **equals 메서드는 동치관계(equivalence relation)를 구현하며, 다음을 만족한다.**
 
-1. **반사성(reflexivity)** : null이 아닌 모든 참조값 x에 대해, x.equals(x)는 true다.
+### 1. **반사성(reflexivity)** : null이 아닌 모든 참조값 x에 대해, x.equals(x)는 true다.
    - 객체는 자기 자신과 같아야 한다.
-2. **대칭성(symmetry)** : null이 아닌 모든 참조값 x, y에 대해, x.equals(y)가 true면 y.equals(x)도 true다.
+### 2. **대칭성(symmetry)** : null이 아닌 모든 참조값 x, y에 대해, x.equals(y)가 true면 y.equals(x)도 true다.
    - 두 객체는 서로에 대한 동치 여부에 똑같이 답해야 한다는 뜻.
 - 다음과 같이 대소문자를 구분하지 않는 CaseInsensitiveString 클래스가 있다.
 
@@ -106,7 +106,7 @@ s.equals(cis); //false
 - 이를 해결하기 위해서는 equals에서 **일반 String과 비교하는 부분을 없애야 한다.**
 
 
-3. **추이성(transitivity)** : null이 아닌 모든 참조값 x,y,z에 대해, x.equals(y)가 true이고 y.equals(z)도 true면 x.equals(z)도 true다.
+### 3. **추이성(transitivity)** : null이 아닌 모든 참조값 x,y,z에 대해, x.equals(y)가 true이고 y.equals(z)도 true면 x.equals(z)도 true다.
 
 ```java
 // 2차원 점 클래스
@@ -208,7 +208,7 @@ public boolean equals(Object o) {
 - Point의 하위 클래스는 정의상 여전히 Point이므로 어디서든 Point로써 활용될 수 있아야 한다. 는 말이다.
 ```
 
-**괜찮은 우회방법 - 상속 대신 컴포지션을 사용(item18)**
+### **괜찮은 우회방법 - 상속 대신 컴포지션을 사용(item18)**
 
 ```java
 // equals 규약을 지키면서 값 추가하기
@@ -248,7 +248,7 @@ public class ColorPoint {
 추상클래스의 하위 클래스라면 equals 규약을 지키면서도 값을 추가 할 수 있음. → 상위 클래스를 직접 인스턴스화 할 수 없다면 지금까지의 문제들은 일어나지 않음
 ```
 
-4. **일관성(consistency)** : null이 아닌 모든 참조 값 x,y 에 대해, x.equals(y)를 반복해서 호출하면 항상 true를 반환하거나 항상 false를 반환한다.
+### 4. **일관성(consistency)** : null이 아닌 모든 참조 값 x,y 에 대해, x.equals(y)를 반복해서 호출하면 항상 true를 반환하거나 항상 false를 반환한다.
 
 - 두 객체가 같다면 수정되지 않는 한 앞으로도 영원히 같아야 함
   - 가변객체는 비교시점에 따라 다르지만, 불변 객체는 한번 다르면 끝까지 달라야 함
@@ -256,7 +256,7 @@ public class ColorPoint {
 - **equals의 판단에 신뢰할 수 없는 자원이 끼어들게 해서는 안됨**
   - **문제를 일으키지 않으려면 equals는 항시 메모리에 존재하는 객체만을 사용한 결정적 계산만 수행해야 한다!!**
   
-5. **null-아님** : null이 아닌 모든 참조 값 x에 대해, x.equals(null)은 false다.
+### 5. **null-아님** : null이 아닌 모든 참조 값 x에 대해, x.equals(null)은 false다.
 
 - 모든 객체가 null과 같지 않아야 함
 - 명시적 null 검사 → 필요없음
