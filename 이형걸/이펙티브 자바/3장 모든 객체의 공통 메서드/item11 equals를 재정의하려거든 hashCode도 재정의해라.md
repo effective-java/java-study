@@ -106,16 +106,16 @@ public int hashCode() {
 - 위에서 소개한 제작 요령도 품질이나 기능면에서 충분히 훌륭하지만, 
 - **단, 해시 충돌이 더욱 적은 방법을 꼭 써야 한다면 구아바의 com.google.common.hash.Hashing을 참고하자.**
 
-## **Object 클래스의 hash**
+## **Objects 클래스의 hash()**
 
-Object 클래스는 임의의 개수만큼 객체를 받아 해시코드를 계산해주는 정적 메서드인 `hash`를 제공함
+`Objects 클래스`는 임의의 개수만큼 객체를 받아 해시코드를 계산해주는 정적 메서드인 `hash`를 제공함
 
 이 메소드를 활용하면 앞의 요령대로 구현한 코드와 비슷한 수준의 hashCode 함수를 단 한줄로 작성할 수 있다.
 - 하지만 **속도는 더 느리다.**
-  - 입력 인수를 담기 위한 배열이 만들어지고, 입력 중 기본 타입이 있다면 박싱(auto-boxing)과 언박싱(unboxing)도 거쳐야 하기 때문이다.
+  - **입력 인수를 담기 위한 배열이 만들어지고, 입력 중 기본 타입이 있다면 박싱(auto-boxing)과 언박싱(unboxing)도 거쳐야 하기 때문이다.**
 - hash 메소드는 성능에 민감하지 않은 상황에서만 사용할 것
 
-### Object클래스의 hashCode()를 적용한 Phone Number클래스의 hashCode 메소드
+### Objects클래스의 hash()를 적용한 Phone Number클래스의 hashCode 메소드
 
 - 성능이 아쉽다.
 
