@@ -303,19 +303,23 @@ public synchronized Object clone() {
 
 ## 복사 생성자와 복사 팩터리 메서드
 
+*Cloneable을 이미 구현한 클래스를 확장하는 경우(clone을 잘 구현해야함)* 가 **아닌 경우!!**
+
 ```java
 public Yum(Yum yum) {}
 public static Yum newInstance(Yum yum) {}
 ```
 
-복사 생성자와 복사 팩터리 메서드는 Cloneable/clone 방식보다 나은 면이 많다.
+**복사 생성자와 복사 팩터리 메서드는 Cloneable/clone 방식보다 나은 면이 많다.**
+
+`복사 생성자` : **자신과 같은 클래스의 인스턴스를 인수로 받는 생성자**
 
 - 언어 모순적이고 위험한 객체 생성 메커니즘을 사용하지 않는다. (super.clone())
 - clone 규약에 기대지 않는다.
 - 정상적인 final필드 용법과도 충돌하지 않는다.
 - 불필요한 check exception 처리가 필요없다.
 - 형변환도 필요없다.
-- 복사 생성자와 복사 팩터리는 인터페이스 타입의 인스턴스를 인수로 받을 수 있다.
+- **복사 생성자와 복사 팩터리는 인터페이스 타입의 인스턴스를 인수로 받을 수 있다.**
 
 ## 결론
 - 새로운 Interface를 만들때는 절대 Cloneable를 확장해서는 안되며,새로운 - 클래스 또한 Cloneable 를 구현해서는 안된다.
