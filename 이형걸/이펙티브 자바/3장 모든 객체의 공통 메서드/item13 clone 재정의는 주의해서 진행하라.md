@@ -252,7 +252,7 @@ public class HashTable implements Cloneable  {
 - `재귀 호출` 때문에 연결리스트의 size만큼 스택프레임을 소비하여, 리스트가 길면 `StackOverflow에러`를 발생시킬 위험이 있다.
 - 이 문제를 해결하기 위해서는 재귀 호출을 통한 deepcopy대신 **반복자를 써서 순회하는 방법으로 수정해야 한다.**
 
-### 3번째 방법. suprt.clone을 호출하여 얻은 객체의 모든 필드를 초기 상태로 설정한 다음, 원본 객체의 상태를 다시 생성하는 고수준 메서드들을 호출한다.
+### 3번째 방법. super.clone을 호출하여 얻은 객체의 모든 필드를 초기 상태로 설정한 다음, 원본 객체의 상태를 다시 생성하는 고수준 메서드들을 호출한다.
 
 - HashTable을 예로 들면, buckets필드를 새로운 배열로 초기화 한다음 원본테이블의 있는 버킷의 내용을 put(key, value) 메서드를 호출해
 새로 버킷을 만드는 방법이 있다.
@@ -325,3 +325,6 @@ public static Yum newInstance(Yum yum) {}
 - 새로운 Interface를 만들때는 절대 Cloneable를 확장해서는 안되며,새로운 - 클래스 또한 Cloneable 를 구현해서는 안된다.
 - **기본 원칙은 복제 기능은 생성자와 팩터리를 이용하는것이 최고다.**
 - 단, `배열`만은 **clone메서드 방식이 가장 깔끔**해서 **이 규칙의 예외**라고 할 수 있다.
+
+#### 참고
+- https://jaehun2841.github.io/2019/01/13/effective-java-item13/
