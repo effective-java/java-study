@@ -2313,6 +2313,7 @@ HashMap은 **Entry** 라는 **내부 클래스**를 정의하고, 다시 Entry�
 - **void putAll()** : map에 저장된 모든 요소를 HashMap에 저장
 - **Object replace(Object key, Object value)** : 지정된 Key의 값을 지정된 객체(value)로 대체
 - **boolean replace(Object key, Object oldValue, Object newValue)** : 지정된 key와 객체(oldValue)가 모두 일치하는 경우에만 세로운 객체(newValue)로 대체
+- **default V putIfAbsent(K key, V value)** : **Key 값이 존재하는 경우 Map의 Value의 값을 반환하고, Key값이 존재하지 않는 경우 Key와 Value를 Map에 저장하고 Null을 반환합니다.**
 
 [hashMap 사용 예시 - 중복된 key 사용시 value의 값은 덮어씌워진다]
 
