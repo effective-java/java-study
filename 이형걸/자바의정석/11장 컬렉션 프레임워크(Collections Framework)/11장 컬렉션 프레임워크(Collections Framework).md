@@ -2559,6 +2559,75 @@ K : ###### 6
 - 한정된 범위 내에 있는 순차적인 값들의 빈도수는 배열을 이용하지만, 
 - **한정되지 않은 범위**의 **비순차적인 값들의 빈도수**는 **HashMap을 이용**해서 구할 수 있다. 
 
+
+### Map의 entrySet() 사용 방법
+
+키-값 쌍 접근하기 Map.Entry 인터페이스를 사용하여 각 키-값 쌍에 접근할 수 있습니다. 다음과 같이 코드를 작성할 수 있습니다:
+
+```java
+Map<String, Integer> map = new HashMap<>();
+map.put("apple", 3);
+map.put("banana", 5);
+map.put("cherry", 7);
+
+for (Map.Entry<String, Integer> entry : map.entrySet()) {
+    String key = entry.getKey();
+    Integer value = entry.getValue();
+    System.out.println("Key: " + key + ", Value: " + value);
+}
+```
+
+이 코드는 다음과 같은 출력 결과를 보여줍니다:
+
+```
+Key: apple, Value: 3
+Key: banana, Value: 5
+Key: cherry, Value: 7
+```
+
+키와 값을 별도로 접근하기 entrySet()을 사용하지 않고 keySet()과 values()를 사용하여 키와 값을 별도로 접근할 수도 있습니다:
+
+```java
+Map<String, Integer> map = new HashMap<>();
+map.put("apple", 3);
+map.put("banana", 5);
+map.put("cherry", 7);
+
+for (String key : map.keySet()) {
+    Integer value = map.get(key);
+    System.out.println("Key: " + key + ", Value: " + value);
+}
+```
+
+이 코드의 출력 결과는 위의 코드와 동일합니다.
+
+Map 정렬하기 entrySet()을 사용하면 Map의 키-값 쌍을 정렬할 수 있습니다. 다음은 키를 기준으로 오름차순 정렬하는 예시입니다:
+
+```java
+Map<String, Integer> map = new HashMap<>();
+map.put("apple", 3);
+map.put("banana", 5);
+map.put("cherry", 7);
+
+List<Map.Entry<String, Integer>> entries = new ArrayList<>(map.entrySet());
+entries.sort(Map.Entry.comparingByKey());
+
+for (Map.Entry<String, Integer> entry : entries) {
+    System.out.println("Key: " + entry.getKey() + ", Value: " + entry.getValue());
+}
+```
+
+이 코드의 출력 결과는 다음과 같습니다:
+
+```
+Key: apple, Value: 3
+Key: banana, Value: 5
+Key: cherry, Value: 7
+```
+
+이처럼 entrySet()을 사용하면 Map의 모든 키-값 쌍을 효과적으로 처리할 수 있습니다. 필요에 따라 키와 값을 별도로 접근하거나, 정렬 기준을 변경할 수 있습니다.
+
+
 ### 해싱과 해시함수
 
 `해싱(hashing)`이란 `해시함수(hash function)`을 이용해서 **데이터**를 **해시테이블(hash table)** 에 **저장하고 검색하는 기법**을 말한다.
