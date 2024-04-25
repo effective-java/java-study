@@ -2559,6 +2559,40 @@ K : ###### 6
 - 한정된 범위 내에 있는 순차적인 값들의 빈도수는 배열을 이용하지만, 
 - **한정되지 않은 범위**의 **비순차적인 값들의 빈도수**는 **HashMap을 이용**해서 구할 수 있다. 
 
+### Map의 putIFAbsent(), computeIfAbsent() 사용 방법
+
+```java
+public class ComputeIfAbsentTest {
+
+    public static void main(String[] args) {
+        // Map 선언
+        Map<String, Set<Integer>> map = new HashMap<>();
+
+        // 키 'a'에 대한 Set 추가
+        map.put("a", new HashSet<>());
+
+        // 키 'a'의 Set에 값 추가
+        map.get("a").add(1);
+        map.get("a").add(2);
+        map.get("a").add(3);
+
+        // map.computeIfAbsent
+        map.computeIfAbsent("b", k -> new HashSet<>()).add(4);
+        map.computeIfAbsent("b", k -> new HashSet<>()).add(5);
+        map.computeIfAbsent("b", k -> new HashSet<>(){{ add(7); }});
+        map.computeIfAbsent("b", k -> new HashSet<>(){{ add(8); }});
+        map.computeIfAbsent("b", k -> new HashSet<>()).add(6);
+
+        // map.putIfAbsent
+        map.putIfAbsent("c", new HashSet<>(){{ add(1); }});
+        map.putIfAbsent("c", new HashSet<>(){{ add(2); }});
+        map.putIfAbsent("b", new HashSet<>(){{ add(3); }});
+
+        System.out.println(map); // 출력 결과: {a=[1, 2, 3], b=[4, 5, 6], c=[1]}
+    }
+}
+```
+
 
 ### Map의 entrySet() 사용 방법
 
